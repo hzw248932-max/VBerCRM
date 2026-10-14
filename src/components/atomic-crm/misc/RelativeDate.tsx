@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { differenceInDays, formatRelative } from "date-fns";
-import { enUS, fr } from "date-fns/locale";
+import { enUS, fr, zhCN } from "date-fns/locale";
 import { useLocaleState } from "ra-core";
 
 /**
@@ -23,7 +23,7 @@ import { useLocaleState } from "ra-core";
  */
 
 const getDateFnsLocale = (locale: string) =>
-  locale.startsWith("fr") ? fr : enUS;
+  locale.startsWith("zh") ? zhCN : locale.startsWith("fr") ? fr : enUS;
 
 export const formatLocalizedDate = (date: string, locale = "en") =>
   new Intl.DateTimeFormat(locale, {

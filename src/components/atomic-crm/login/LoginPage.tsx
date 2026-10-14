@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from "../misc/LanguageSwitcher";
 import { useEffect, useRef, useState } from "react";
 import { Form, required, useLogin, useNotify, useTranslate } from "ra-core";
 import type { SubmitHandler, FieldValues } from "react-hook-form";
@@ -94,12 +95,19 @@ export const LoginPage = (props: { redirectTo?: string }) => {
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
-            <img className="h-6 mr-2" src={darkModeLogo} alt={title} />
+            <img
+              className="h-8 w-8 rounded-full mr-2"
+              src={darkModeLogo}
+              alt={title}
+            />
             {title}
           </div>
         </div>
         <div className="flex flex-col justify-center w-full p-4 lg:p-8">
           <div className="w-full space-y-6 lg:mx-auto lg:w-[350px]">
+            <div className="flex justify-end">
+              <LanguageSwitcher />
+            </div>
             <div className="text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
                 {translate("ra.auth.sign_in")}

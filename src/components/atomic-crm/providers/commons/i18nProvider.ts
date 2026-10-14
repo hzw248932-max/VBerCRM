@@ -6,6 +6,13 @@ import { raSupabaseEnglishMessages } from "ra-supabase-language-english";
 import { raSupabaseFrenchMessages } from "ra-supabase-language-french";
 import { englishCrmMessages } from "./englishCrmMessages";
 import { frenchCrmMessages } from "./frenchCrmMessages";
+import { chineseCrmMessages } from "./chineseCrmMessages";
+import {
+  chineseAdminMessages,
+  chineseSupabaseMessages,
+} from "./chineseAdminMessages";
+import { brandMessages } from "./brandMessages";
+import { chineseChoiceMessages } from "./chineseChoiceMessages";
 
 const raSupabaseEnglishMessagesOverride = {
   "ra-supabase": {
@@ -47,6 +54,7 @@ const englishCatalog = mergeTranslations(
   raSupabaseEnglishMessages,
   raSupabaseEnglishMessagesOverride,
   englishCrmMessages,
+  brandMessages.en,
 );
 
 const frenchCatalog = mergeTranslations(
@@ -55,14 +63,32 @@ const frenchCatalog = mergeTranslations(
   raSupabaseFrenchMessages,
   raSupabaseFrenchMessagesOverride,
   frenchCrmMessages,
+  brandMessages.fr,
 );
 
-export const getInitialLocale = (): "en" | "fr" => {
+const chineseCatalog = mergeTranslations(
+  englishCatalog,
+  chineseAdminMessages,
+  chineseSupabaseMessages,
+  chineseCrmMessages,
+  brandMessages.zh,
+  chineseChoiceMessages,
+);
+const supportedLocales = ["en", "fr", "zh-CN"];
+export const getInitialLocale = (): "en" | "fr" | "zh-CN" => {
+  try {
+    const saved = localStorage.getItem("vbercrm.locale");
+    if (saved && supportedLocales.includes(saved))
+      return saved as "en" | "fr" | "zh-CN";
+  } catch {
+    /* Storage can be unavailable in restricted contexts. */
+  }
   if (typeof navigator === "undefined") {
     return "en";
   }
 
   const browserLocale = navigator.languages?.[0] ?? navigator.language;
+  if (browserLocale?.toLowerCase().startsWith("zh")) return "zh-CN";
   if (browserLocale?.toLowerCase().startsWith("fr")) {
     return "fr";
   }
@@ -72,6 +98,7 @@ export const getInitialLocale = (): "en" | "fr" => {
 
 export const i18nProvider = polyglotI18nProvider(
   (locale) => {
+    if (locale === "zh-CN") return chineseCatalog;
     if (locale === "fr") {
       return frenchCatalog;
     }
@@ -80,10 +107,25 @@ export const i18nProvider = polyglotI18nProvider(
   getInitialLocale(),
   [
     { locale: "en", name: "English" },
+    { locale: "zh-CN", name: "简体中文" },
     { locale: "fr", name: "Français" },
   ],
   { allowMissing: true },
 );
+
+const changeLocale = i18nProvider.changeLocale.bind(i18nProvider);
+i18nProvider.changeLocale = async (locale: string) => {
+  await changeLocale(locale);
+  const resolved = supportedLocales.includes(locale) ? locale : "en";
+  if (typeof document !== "undefined") document.documentElement.lang = resolved;
+  try {
+    localStorage.setItem("vbercrm.locale", resolved);
+  } catch {
+    /* Switching works without persistence. */
+  }
+};
+if (typeof document !== "undefined")
+  document.documentElement.lang = getInitialLocale();
 
 export const testI18nProvider = polyglotI18nProvider(
   () => englishCatalog,

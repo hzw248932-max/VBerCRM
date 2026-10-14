@@ -22,7 +22,9 @@ export const CompanyCard = (props: { record?: Company }) => {
   if (!record) return null;
 
   const sector = companySectors.find((s) => s.value === record.sector);
-  const sectorLabel = sector?.label;
+  const sectorLabel = sector
+    ? translate(sector.label, { _: sector.label })
+    : "";
 
   return (
     <Link

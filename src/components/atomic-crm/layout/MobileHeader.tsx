@@ -1,5 +1,6 @@
 import { GlobalSearchButton } from "../search/GlobalSearchButton";
 import { MobileRefreshButton } from "./MobileRefreshButton";
+import { LanguageSwitcher } from "../misc/LanguageSwitcher";
 
 // The search lives here rather than in each screen: there is no Cmd+K on a
 // phone, so this header is the only place reachable from every mobile page.
@@ -16,6 +17,7 @@ const MobileHeader = ({
     <header className="fixed top-0 left-0 right-0 z-10 bg-secondary h-14 px-4 w-full flex justify-between items-center">
       {children}
       <div className="flex items-center">
+        <LanguageSwitcher />
         <GlobalSearchButton variant="icon" />
         {showRefresh ? <MobileRefreshButton /> : null}
       </div>

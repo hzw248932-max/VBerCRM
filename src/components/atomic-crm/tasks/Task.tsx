@@ -112,7 +112,9 @@ export const Task = ({
                         (taskType) => taskType.value === task.type,
                       );
                       return matchedTaskType
-                        ? matchedTaskType.label
+                        ? translate(matchedTaskType.label, {
+                            _: matchedTaskType.label,
+                          })
                         : task.type;
                     })()}
                   </span>

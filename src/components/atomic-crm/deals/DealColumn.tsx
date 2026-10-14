@@ -1,4 +1,5 @@
 import { Droppable } from "@hello-pangea/dnd";
+import { useTranslate } from "ra-core";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
@@ -14,11 +15,13 @@ export const DealColumn = ({
 }) => {
   const totalAmount = deals.reduce((sum, deal) => sum + deal.amount, 0);
   const { dealStages, currency } = useConfigurationContext();
+  const translate = useTranslate();
+  const stageLabel = findDealLabel(dealStages, stage) ?? stage;
   return (
     <div className="flex-1 pb-8">
       <div className="flex flex-col items-center">
         <h3 className="text-base font-medium">
-          {findDealLabel(dealStages, stage)}
+          {translate(stageLabel, { _: stageLabel })}
         </h3>
         <p className="text-sm text-muted-foreground">
           {totalAmount.toLocaleString("en-US", {

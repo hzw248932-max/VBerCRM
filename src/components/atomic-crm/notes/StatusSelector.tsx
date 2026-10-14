@@ -53,7 +53,7 @@ export const StatusSelector = ({
                   className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: selectedOption.color }}
                 />
-                {selectedOption.label}
+                {translate(selectedOption.label, { _: selectedOption.label })}
               </>
             ) : (
               noneLabel
@@ -73,7 +73,7 @@ export const StatusSelector = ({
           <option value="">{noneLabel}</option>
           {noteStatuses.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {translate(opt.label, { _: opt.label })}
             </option>
           ))}
         </select>
@@ -111,7 +111,7 @@ export const StatusSelector = ({
                 className="inline-block w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: statusOption.color }}
               />
-              {statusOption.label}
+              {translate(statusOption.label, { _: statusOption.label })}
             </div>
           </SelectItem>
         ))}

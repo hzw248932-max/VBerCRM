@@ -1,4 +1,12 @@
-# Atomic CRM
+# VBerCRM
+
+Customer relationships and business development for the global games industry.
+
+Includes the official VBerCRM logo and English / 简体中文 language switching. Use the header selector or profile preferences; the choice is remembered in this browser. French remains available.
+
+Run `npm run dev:demo -- --port 5175 --host 127.0.0.1` for the demo. Sample data resets on reload. Production still requires your own Supabase setup.
+
+## Based on Atomic CRM
 
 A full-featured CRM built with React, shadcn-admin-kit, and Supabase.
 
@@ -66,7 +74,7 @@ The user and developer documentation for this project is available [in the `doc/
 
 ## Testing Changes
 
-This project contains unit tests and e2e. 
+This project contains unit tests and e2e.
 Run unit test with the following command:
 
 ```sh

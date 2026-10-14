@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from "../misc/LanguageSwitcher";
 import { FileText, Import, Settings, User, Users } from "lucide-react";
 import { CanAccess, useTranslate, useUserMenu } from "ra-core";
 import { Link, matchPath, useLocation } from "react-router";
@@ -40,12 +41,12 @@ const Header = () => {
                 className="flex items-center gap-2 text-secondary-foreground no-underline"
               >
                 <img
-                  className="[.light_&]:hidden h-6"
+                  className="[.light_&]:hidden h-8 w-8 rounded-full"
                   src={darkModeLogo}
                   alt={title}
                 />
                 <img
-                  className="[.dark_&]:hidden h-6"
+                  className="[.dark_&]:hidden h-8 w-8 rounded-full"
                   src={lightModeLogo}
                   alt={title}
                 />
@@ -82,6 +83,7 @@ const Header = () => {
                 </nav>
               </div>
               <div className="flex items-center">
+                <LanguageSwitcher />
                 <GlobalSearchButton />
                 <ThemeModeToggle />
                 <RefreshButton />
