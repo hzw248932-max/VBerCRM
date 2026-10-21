@@ -48,7 +48,7 @@ stop-app-e2e:
 	kill $$(lsof -t -i:5175)
 
 start-app-e2e-ci: build-e2e ## start the app pointing to the e2e supabase instance in CI mode (no open, no watch)
-	npx serve -l 5175 -L -s dist &
+	npx vite preview --host 127.0.0.1 --port 5175 --strictPort &
 
 start: start-supabase start-app ## start the stack locally
 

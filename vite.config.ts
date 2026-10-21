@@ -30,6 +30,10 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
+        // Authentication documents must never fall back to the CRM dashboard.
+        navigateFallbackDenylist: [
+          /\/(?:auth-callback|email-confirmation)(?:\.html)?$/,
+        ],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
       },
