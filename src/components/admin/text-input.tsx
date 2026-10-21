@@ -48,6 +48,7 @@ export const TextInput = (props: TextInputProps) => {
     helperText,
     validate: _validateProp,
     format: _formatProp,
+    parse: _parseProp,
     ...rest
   } = props;
   const { id, field, isRequired } = useInput(props);

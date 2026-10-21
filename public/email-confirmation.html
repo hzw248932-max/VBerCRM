@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>设置密码 · VBerCRM</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; background: #f5f5f5; color: #171717; }
+      main { max-width: 440px; margin: 12vh auto; padding: 32px; background: white; border-radius: 16px; }
+      p { line-height: 1.7; }
+      button { padding: 12px 20px; background: #171717; color: white; border: 0; border-radius: 8px; font: inherit; cursor: pointer; }
+      button:disabled { opacity: .5; }
+      a { color: #333; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>设置 VBerCRM 密码</h1>
+      <p id="message">请点击下方按钮验证邮件并进入密码设置页。仅打开本页不会使用你的验证链接。</p>
+      <button id="continue" type="button" hidden>继续设置密码</button>
+      <p><a href="./#/forgot-password">链接失效？重新获取设置密码邮件</a></p>
+    </main>
+    <script>
+      // Keep the one-time token in the fragment and do not verify on page load:
+      // email scanners that preview the page must not consume the invitation.
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const token = params.get('token_hash');
+      const type = params.get('type');
+      const button = document.getElementById('continue');
+      if (token && /^[a-f0-9]{32,128}$/i.test(token) && ['invite', 'recovery'].includes(type)) {
+        button.hidden = false;
+        button.addEventListener('click', () => {
+          button.disabled = true;
+          const verification = new URL('https://frrmrjfadztokldhyvxe.supabase.co/auth/v1/verify');
+          verification.searchParams.set('token', token);
+          verification.searchParams.set('type', type);
+          verification.searchParams.set('redirect_to', new URL('./auth-callback.html', window.location.href).href);
+          window.location.replace(verification.href);
+        });
+      } else {
+        document.getElementById('message').textContent = '邮件链接不完整，请从最新邮件重新打开，或重新获取设置密码邮件。';
+      }
+    </script>
+  </body>
+</html>

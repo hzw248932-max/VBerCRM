@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useResetPassword } from "ra-supabase-core";
-import { Form, required, useNotify, useRedirect, useTranslate } from "ra-core";
+import {
+  Form,
+  required,
+  email,
+  useNotify,
+  useRedirect,
+  useTranslate,
+} from "ra-core";
 import { Layout } from "@/components/supabase/layout";
 import type { FieldValues, SubmitHandler } from "react-hook-form";
 import { TextInput } from "@/components/admin/text-input";
@@ -29,7 +36,7 @@ export const ForgotPasswordPage = () => {
       setLoading(true);
       setRateLimitMessage(null);
       await resetPassword({
-        email: values.email,
+        email: values.email.trim(),
         redirectTo: new URL(
           `${import.meta.env.BASE_URL}auth-callback.html`,
           window.location.href,
@@ -37,6 +44,12 @@ export const ForgotPasswordPage = () => {
       });
     } catch (error: any) {
       const message = typeof error === "string" ? error : error?.message;
+      if (
+        /Unable to validate email address|invalid email/i.test(message ?? "")
+      ) {
+        notify("ra.validation.email", { type: "warning" });
+        return;
+      }
       if (
         error?.code === "over_email_send_rate_limit" ||
         /email rate limit exceeded/i.test(message ?? "")
@@ -103,7 +116,11 @@ export const ForgotPasswordPage = () => {
             _: "Email",
           })}
           autoComplete="email"
-          validate={required()}
+          inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          parse={(value) => (typeof value === "string" ? value.trim() : value)}
+          validate={[required(), email()]}
         />
         <Button type="submit" className="cursor-pointer" disabled={loading}>
           {translate("crm.action.reset_password", {
