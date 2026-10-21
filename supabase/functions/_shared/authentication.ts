@@ -73,6 +73,16 @@ export const UserMiddleware = async (
       return createErrorResponse(401, "Unauthorized");
     }
 
+    // Check current membership on every privileged operation, even with an
+    // unexpired access token issued before the account was disabled.
+    const { data: member, error: memberError } = await localClient
+      .from("sales")
+      .select("id, disabled")
+      .eq("user_id", data.user.id)
+      .single();
+    if (memberError || !member || member.disabled) {
+      return createErrorResponse(403, "Inactive CRM member");
+    }
     return next(req, data.user);
   } catch (err) {
     return createErrorResponse(401, err?.toString() || "Unauthorized");

@@ -218,6 +218,14 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/recruitment/Recruitment.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/recruitment/model.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/providers/types.ts",
           "type": "registry:component"
         },
@@ -235,6 +243,10 @@
         },
         {
           "path": "src/components/atomic-crm/providers/supabase/authProvider.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/providers/supabase/authCallback.ts",
           "type": "registry:component"
         },
         {

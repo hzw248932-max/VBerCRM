@@ -9,8 +9,8 @@
         <meta name="theme-color" content="#000000" />
         <meta name="google" content="notranslate" />
         <link rel="manifest" href="./manifest.json" />
-        <link rel="shortcut icon" href="./favicon.ico" />
-        <title>Atomic CRM</title>
+        <link rel="shortcut icon" href="./vber-logo.png" />
+        <title>VBerCRM</title>
         <style>
             body {
                 margin: 0;
@@ -118,24 +118,14 @@
         </div>
     </body>
     <script>
-        const getUrlParams = () => {
-            const urlSearchParams = new URLSearchParams(
-                window.location.hash.substring(1)
-            );
-            const access_token = urlSearchParams.get('access_token');
-            const refresh_token = urlSearchParams.get('refresh_token');
-            const type = urlSearchParams.get('type');
-
-            return { access_token, refresh_token, type };
-        };
-
-        function interceptAuthCallback() {
-                const hash = window.location.hash;
-                const {access_token, refresh_token, type} = getUrlParams();
-                window.location.href = `./#/auth-callback?access_token=${access_token}&refresh_token=${refresh_token}&type=${type}`;
+        // Keep tokens in the fragment, encode their values, and remove this
+        // intermediate URL from history. Only forward supported auth fields.
+        const incoming = new URLSearchParams(window.location.hash.slice(1));
+        const forwarded = new URLSearchParams();
+        for (const key of ['access_token', 'refresh_token', 'type', 'error', 'error_code']) {
+            const value = incoming.get(key);
+            if (value && value !== 'null') forwarded.set(key, value);
         }
-    
-        // Call the function to intercept the auth callback
-        interceptAuthCallback();
+        window.location.replace('./#/auth-callback?' + forwarded.toString());
     </script>
 </html>

@@ -9,8 +9,10 @@ import type {
   Task,
 } from "../../../types";
 import type { ConfigurationContextValue } from "../../../root/ConfigurationContext";
+import type { Recruitment } from "../../../recruitment/model";
 
 export interface Db {
+  recruitment: Recruitment[];
   companies: Company[];
   contacts: Contact[];
   contact_notes: ContactNote[];

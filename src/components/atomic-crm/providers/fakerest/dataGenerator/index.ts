@@ -11,6 +11,7 @@ import type { Db } from "./types";
 
 export default (): Db => {
   const db = {} as Db;
+  db.recruitment = [];
   db.sales = generateSales(db);
   db.tags = generateTags(db);
   db.companies = generateCompanies(db);

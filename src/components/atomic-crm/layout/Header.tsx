@@ -26,6 +26,8 @@ const Header = () => {
     currentPath = "/companies";
   } else if (matchPath("/deals/*", location.pathname)) {
     currentPath = "/deals";
+  } else if (matchPath("/recruitment/*", location.pathname)) {
+    currentPath = "/recruitment";
   } else {
     currentPath = false;
   }
@@ -54,6 +56,11 @@ const Header = () => {
               </Link>
               <div>
                 <nav className="flex">
+                  <NavigationTab
+                    label="招聘信号"
+                    to="/recruitment"
+                    isActive={currentPath === "/recruitment"}
+                  />
                   <NavigationTab
                     label={translate("ra.page.dashboard")}
                     to="/"

@@ -27,9 +27,11 @@ export const defaultCompanySectors = [
 ];
 
 export const defaultDealStages = [
-  { value: "opportunity", label: "Opportunity" },
-  { value: "proposal-sent", label: "Proposal Sent" },
-  { value: "in-negociation", label: "In Negotiation" },
+  { value: "opportunity", label: "Not Contacted" },
+  { value: "contacted", label: "Contacted" },
+  { value: "replied", label: "Replied" },
+  { value: "demo", label: "Demo Scheduled" },
+  { value: "trial", label: "In Trial" },
   { value: "won", label: "Won" },
   { value: "lost", label: "Lost" },
   { value: "delayed", label: "Delayed" },
@@ -38,6 +40,7 @@ export const defaultDealStages = [
 export const defaultDealPipelineStatuses = ["won"];
 
 export const defaultDealCategories = [
+  { value: "vberai", label: "VBerAI Partnership" },
   { value: "other", label: "Other" },
   { value: "copywriting", label: "Copywriting" },
   { value: "print-project", label: "Print project" },

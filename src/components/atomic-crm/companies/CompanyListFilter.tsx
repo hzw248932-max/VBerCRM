@@ -1,17 +1,15 @@
-import { Building, Truck, Users } from "lucide-react";
+import { Building, Globe, Users } from "lucide-react";
 import { FilterLiveForm, useGetIdentity, useTranslate } from "ra-core";
 import { ToggleFilterButton } from "@/components/admin/toggle-filter-button";
 import { SearchInput } from "@/components/admin/search-input";
 
 import { FilterCategory } from "../filters/FilterCategory";
-import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AccountManagerFilter } from "../sales/AccountManagerInput";
 import { getTranslatedCompanySizeLabel } from "./getTranslatedCompanySizeLabel";
 import { sizes } from "./sizes";
 
 export const CompanyListFilter = () => {
   const { identity } = useGetIdentity();
-  const { companySectors } = useConfigurationContext();
   const translate = useTranslate();
   const translatedSizes = sizes.map((size) => ({
     ...size,
@@ -38,15 +36,15 @@ export const CompanyListFilter = () => {
       </FilterCategory>
 
       <FilterCategory
-        icon={<Truck className="h-4 w-4" />}
-        label="resources.companies.fields.sector"
+        icon={<Globe className="h-4 w-4" />}
+        label="resources.companies.fields.country"
       >
-        {companySectors.map((sector) => (
+        {countries.map((country) => (
           <ToggleFilterButton
             className="w-full justify-between"
-            label={sector.label}
-            key={sector.value}
-            value={{ sector: sector.value }}
+            label={country}
+            key={country}
+            value={{ country }}
           />
         ))}
       </FilterCategory>
@@ -65,3 +63,22 @@ export const CompanyListFilter = () => {
     </div>
   );
 };
+
+// Store English country names to match existing company.country records.
+const countries = [
+  "United States",
+  "United Kingdom",
+  "China",
+  "Taiwan",
+  "Japan",
+  "South Korea",
+  "Spain",
+  "France",
+  "Germany",
+  "Vietnam",
+  "Russia",
+  "Thailand",
+  "Portugal",
+  "Brazil",
+  "Saudi Arabia",
+];

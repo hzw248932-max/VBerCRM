@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { AuthMiddleware } from "../_shared/authentication.ts";
+import { AuthMiddleware, UserMiddleware } from "../_shared/authentication.ts";
 import { supabaseAdmin } from "../_shared/supabaseAdmin.ts";
 
 const ATTACHMENTS_BUCKET =
@@ -55,7 +55,9 @@ const deleteNoteAttachments = async (req: Request) => {
 };
 
 Deno.serve(async (req: Request) =>
-  AuthMiddleware(req, async (req: Request) => deleteNoteAttachments(req)),
+  AuthMiddleware(req, async (req: Request) =>
+    UserMiddleware(req, async (req) => deleteNoteAttachments(req)),
+  ),
 );
 
 const getPathsToDelete = (payload: WebhookPayload): string[] => {

@@ -1,5 +1,7 @@
 import { Link } from "react-router";
-import { Translate, useHandleAuthCallback, useTranslate } from "ra-core";
+import { Translate, useAuthProvider, useRedirect, useTranslate } from "ra-core";
+import type { AuthRedirectResult } from "ra-core";
+import { useEffect, useRef, useState } from "react";
 import { CircleAlert, LockIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -23,7 +25,39 @@ import { Loading } from "@/components/admin/loading";
  * );
  */
 export const AuthCallback = () => {
-  const { error } = useHandleAuthCallback();
+  const authProvider = useAuthProvider();
+  const redirect = useRedirect();
+  const [error, setError] = useState<Error | null>(null);
+  // Auth callbacks are one-time operations, not offline-cacheable queries.
+  // In particular, restored mobile query data must never choose this redirect.
+  const pending = useRef<Promise<AuthRedirectResult | void> | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (!pending.current) {
+      pending.current = Promise.resolve().then(() => {
+        if (!authProvider?.handleCallback) {
+          throw new Error("ra.message.auth_error");
+        }
+        return authProvider.handleCallback({});
+      });
+    }
+    pending.current.then(
+      (result) => {
+        if (active && result?.redirectTo !== false) {
+          redirect(result?.redirectTo ?? "/");
+        }
+      },
+      (cause) => {
+        if (active)
+          setError(
+            cause instanceof Error ? cause : new Error("ra.message.auth_error"),
+          );
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [authProvider, redirect]);
   if (error) {
     return (
       <AuthError

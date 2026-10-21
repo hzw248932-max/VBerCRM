@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Home, ListTodo, Plus, Settings, Users } from "lucide-react";
+import { Home, ListTodo, Plus, Settings, Users, Briefcase } from "lucide-react";
 import { useTranslate } from "ra-core";
 import { Link, matchPath, useLocation, useMatch } from "react-router";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
@@ -54,6 +54,12 @@ export const MobileNavigation = () => {
     >
       <div className="flex justify-center">
         <>
+          <NavigationButton
+            href="/recruitment"
+            Icon={Briefcase}
+            label="招聘信号"
+            isActive={!!matchPath("/recruitment/*", location.pathname)}
+          />
           <NavigationButton
             href="/"
             Icon={Home}

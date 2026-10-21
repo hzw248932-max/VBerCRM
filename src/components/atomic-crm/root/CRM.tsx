@@ -16,6 +16,11 @@ import { SetPasswordPage } from "@/components/supabase/set-password-page";
 import { OAuthConsentPage } from "@/components/supabase/oauth-consent-page";
 
 import companies from "../companies";
+import {
+  RecruitmentList,
+  RecruitmentCreate,
+  RecruitmentEdit,
+} from "../recruitment/Recruitment";
 import contacts from "../contacts";
 import { Dashboard } from "../dashboard/Dashboard";
 import { MobileDashboard } from "../dashboard/MobileDashboard";
@@ -265,6 +270,13 @@ const DesktopAdmin = (
       <Resource name="deals" {...deals} />
       <Resource name="contacts" {...contacts} />
       <Resource name="companies" {...companies} />
+      <Resource
+        name="recruitment"
+        options={{ label: "招聘信号" }}
+        list={RecruitmentList}
+        create={RecruitmentCreate}
+        edit={RecruitmentEdit}
+      />
       <Resource name="contact_notes" />
       <Resource name="deal_notes" />
       <Resource name="tasks" />
@@ -307,7 +319,9 @@ const MobileAdmin = (
           // `meta: { persist: false }`, like the global search, which caches one
           // query per typed term.
           shouldDehydrateQuery: (query) =>
-            query.state.status === "success" && query.meta?.persist !== false,
+            query.state.status === "success" &&
+            query.queryKey[0] !== "auth" &&
+            query.meta?.persist !== false,
         },
       }}
     >
@@ -345,7 +359,18 @@ const MobileAdmin = (
         >
           <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
         </Resource>
-        <Resource name="companies" show={CompanyShow} />
+        <Resource
+          name="companies"
+          show={CompanyShow}
+          create={companies.create}
+        />
+        <Resource
+          name="recruitment"
+          options={{ label: "招聘信号" }}
+          list={RecruitmentList}
+          create={RecruitmentCreate}
+          edit={RecruitmentEdit}
+        />
         <Resource name="tasks" list={MobileTasksList} />
       </Admin>
     </PersistQueryClientProvider>

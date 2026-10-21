@@ -341,10 +341,24 @@ async function patchUser(req: Request, currentUserSale: any) {
     );
   }
 
+  // Keep an administrator from locking out their own account.
+  if (
+    currentUserSale.id === sale.id &&
+    (disabled === true ||
+      (currentUserSale.administrator && administrator === false))
+  ) {
+    return createErrorResponse(
+      400,
+      "Cannot disable or demote your own account",
+    );
+  }
+
   const { data, error: userError } =
     await supabaseAdmin.auth.admin.updateUserById(sale.user_id, {
       email,
-      ban_duration: disabled ? "87600h" : "none",
+      ...(currentUserSale.administrator && typeof disabled === "boolean"
+        ? { ban_duration: disabled ? "87600h" : "none" }
+        : {}),
       user_metadata: { first_name, last_name },
     });
 
@@ -387,11 +401,14 @@ async function patchUser(req: Request, currentUserSale: any) {
   }
 
   try {
-    await updateSaleDisabled(data.user.id, disabled);
-    const sale = await updateSaleAdministrator(data.user.id, administrator);
+    await updateSaleDisabled(data.user.id, disabled ?? sale.disabled);
+    const updatedSale = await updateSaleAdministrator(
+      data.user.id,
+      administrator ?? sale.administrator,
+    );
     return new Response(
       JSON.stringify({
-        data: sale,
+        data: updatedSale,
       }),
       {
         headers: {

@@ -41,6 +41,7 @@ import {
   ContextInfo,
 } from "./CompanyAside";
 import { CompanyAvatar } from "./CompanyAvatar";
+import { CompanyRecruitment } from "../recruitment/Recruitment";
 
 export const CompanyShow = () => {
   const isMobile = useIsMobile();
@@ -83,6 +84,7 @@ const CompanyShowContentMobile = () => {
         <AddressInfo record={record} />
         <ContextInfo record={record} />
         <AdditionalInfo record={record} />
+        <CompanyRecruitment companyId={record.id} />
       </MobileContent>
     </>
   );
@@ -118,7 +120,8 @@ const CompanyShowContent = () => {
               <h5 className="text-xl ml-2 flex-1">{record.name}</h5>
             </div>
             <Tabs defaultValue={currentTab} onValueChange={handleTabChange}>
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="flex w-full flex-wrap h-auto">
+                <TabsTrigger value="recruitment">招聘信号</TabsTrigger>
                 <TabsTrigger value="activity">
                   {translate("crm.common.activity")}
                 </TabsTrigger>
@@ -139,6 +142,9 @@ const CompanyShowContent = () => {
               </TabsList>
               <TabsContent value="activity" className="pt-2">
                 <ActivityLog companyId={record.id} context="company" />
+              </TabsContent>
+              <TabsContent value="recruitment">
+                <CompanyRecruitment companyId={record.id} />
               </TabsContent>
               <TabsContent value="contacts">
                 {record.nb_contacts ? (

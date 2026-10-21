@@ -1,6 +1,8 @@
 import type { AuthProvider } from "ra-core";
 import { supabaseAuthProvider } from "ra-supabase-core";
 
+import { completeEmailCallback } from "./authCallback";
+
 import { canAccess } from "../commons/canAccess";
 import { getSupabaseClient } from "./supabase";
 
@@ -21,8 +23,8 @@ const getBaseAuthProvider = () =>
     },
   });
 
-// To speed up checks, we cache the initialization state
-// and the current sale in the local storage. They are cleared on logout.
+// Initialization is cached. Membership/roles are reloaded for every access check;
+// persisted identity data is never trusted as an authorization decision.
 const IS_INITIALIZED_CACHE_KEY = "RaStore.auth.is_initialized";
 const CURRENT_SALE_CACHE_KEY = "RaStore.auth.current_sale";
 
@@ -54,10 +56,6 @@ export async function getIsInitialized() {
 
 const getSale = async () => {
   const storage = getLocalStorage();
-  const cachedValue = storage?.getItem(CURRENT_SALE_CACHE_KEY);
-  if (cachedValue != null) {
-    return JSON.parse(cachedValue);
-  }
 
   const { data: dataSession, error: errorSession } =
     await getSupabaseClient().auth.getSession();
@@ -69,12 +67,12 @@ const getSale = async () => {
 
   const { data: dataSale, error: errorSale } = await getSupabaseClient()
     .from("sales")
-    .select("id, first_name, last_name, avatar, administrator")
+    .select("id, first_name, last_name, avatar, administrator, disabled")
     .match({ user_id: dataSession?.session?.user.id })
     .single();
 
   // Shouldn't happen either as all users are sales but just in case
-  if (dataSale == null || errorSale) {
+  if (dataSale == null || errorSale || dataSale.disabled) {
     return undefined;
   }
 
@@ -92,6 +90,10 @@ export const getAuthProvider = (): AuthProvider => {
   const baseAuthProvider = getBaseAuthProvider();
   return {
     ...baseAuthProvider,
+    handleCallback: async () => {
+      clearCache();
+      return completeEmailCallback(getSupabaseClient(), window.location.hash);
+    },
     login: async (params) => {
       if (params.ssoDomain) {
         const { error } = await getSupabaseClient().auth.signInWithSSO({
@@ -102,6 +104,7 @@ export const getAuthProvider = (): AuthProvider => {
         }
         return;
       }
+      clearCache();
       return baseAuthProvider.login(params);
     },
     logout: async (params) => {
@@ -141,7 +144,12 @@ export const getAuthProvider = (): AuthProvider => {
         };
       }
 
-      return baseAuthProvider.checkAuth(params);
+      await baseAuthProvider.checkAuth(params);
+      if (!(await getSale())) {
+        clearCache();
+        await getSupabaseClient().auth.signOut();
+        throw { redirectTo: "/login", message: "ra.auth.sign_in_error" };
+      }
     },
     canAccess: async (params) => {
       const isInitialized = await getIsInitialized();

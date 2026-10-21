@@ -277,12 +277,12 @@ end;
 $$;
 
 CREATE OR REPLACE FUNCTION "public"."is_admin"() RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
+    LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
 begin
   return exists (
-    select 1 from public.sales where user_id = auth.uid() and administrator = true
+    select 1 from public.sales where user_id = auth.uid() and administrator = true and disabled is not true
   );
 end;
 $$;

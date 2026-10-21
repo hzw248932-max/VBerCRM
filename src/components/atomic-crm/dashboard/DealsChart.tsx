@@ -8,7 +8,7 @@ import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 
-const multiplier = {
+const multiplier: Record<string, number> = {
   opportunity: 0.2,
   "proposal-sent": 0.5,
   "in-negociation": 0.8,
@@ -63,8 +63,8 @@ export const DealsChart = memo(() => {
         pending: dealsByMonth[month]
           .filter((deal: Deal) => !["won", "lost"].includes(deal.stage))
           .reduce((acc: number, deal: Deal) => {
-            // @ts-expect-error - multiplier type issue
-            acc += deal.amount * multiplier[deal.stage];
+            // Custom BD stages have no agreed probability yet.
+            acc += deal.amount * (multiplier[deal.stage] ?? 0);
             return acc;
           }, 0),
         lost: dealsByMonth[month]
