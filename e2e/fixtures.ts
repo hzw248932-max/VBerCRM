@@ -13,6 +13,7 @@ const TABLES = [
   "contact_notes",
   "deal_notes",
   "deals",
+  "recruitment",
   "contacts",
   "companies",
   "tags",
@@ -213,6 +214,31 @@ const dismissToast = async (page: Page, content: string) => {
   await page.waitForLoadState("networkidle");
 };
 
+async function createRecruitment(company_id: number) {
+  const { data, error } = await adminSupabase
+    .from("recruitment")
+    .insert({
+      company_id,
+      status: "confirmed",
+      score: 5,
+      jobs: [
+        {
+          title: "Game UI Designer",
+          url: "https://example.com/jobs/ui",
+          keywords: "UI icons",
+        },
+      ],
+      pain_points: "Repeated UI variants",
+      matched_features: "UI layer replacement",
+      business_email: "bd@example.com",
+      email_verified: false,
+    })
+    .select()
+    .single();
+  if (error) throw new Error(`Failed to create recruitment: ${error.message}`);
+  return data;
+}
+
 export const test = base.extend<{
   resetDb: void;
   createUser: typeof createUser;
@@ -220,6 +246,7 @@ export const test = base.extend<{
   createCompany: typeof createCompany;
   createContact: typeof createContact;
   createNotes: typeof createNotes;
+  createRecruitment: typeof createRecruitment;
   menu: ReturnType<typeof getMenuMethod>;
   dismissToast: (content: string) => Promise<void>;
 }>({
@@ -252,6 +279,10 @@ export const test = base.extend<{
   // eslint-disable-next-line no-empty-pattern
   createNotes: async ({}, cb) => {
     await cb(createNotes);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  createRecruitment: async ({}, cb) => {
+    await cb(createRecruitment);
   },
   menu: async ({ page, isMobile }, cb) => {
     await cb(getMenuMethod({ page, isMobile }));

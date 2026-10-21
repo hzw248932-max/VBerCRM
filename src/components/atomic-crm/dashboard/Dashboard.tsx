@@ -40,7 +40,12 @@ export const Dashboard = () => {
   }
 
   if (!totalContactNotes) {
-    return <DashboardStepper step={2} contactId={dataContact?.[0]?.id} />;
+    return (
+      <div className="space-y-6">
+        <TasksList />
+        <DashboardStepper step={2} contactId={dataContact?.[0]?.id} />
+      </div>
+    );
   }
 
   return (
