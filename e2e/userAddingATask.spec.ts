@@ -40,6 +40,19 @@ test.describe("user adding a task", () => {
     });
   });
   test("user adding a task", async ({ page, isMobile, menu, dismissToast }) => {
+    page.on("pageerror", (error) =>
+      console.error("Browser error:", error.message),
+    );
+    page.on("response", async (response) => {
+      if (response.url().includes("/rest/v1/") && response.status() >= 400) {
+        console.error(
+          "API failure:",
+          response.status(),
+          new URL(response.url()).pathname,
+          await response.text(),
+        );
+      }
+    });
     await page.goto("/");
     await page.getByLabel("Email").fill("john@doe.com");
     await page.getByLabel("Password").fill("password");
