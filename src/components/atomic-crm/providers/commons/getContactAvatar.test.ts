@@ -7,10 +7,16 @@ vi.mock("../../misc/fetchWithTimeout", () => ({
 }));
 
 describe("getContactAvatar", () => {
-  afterAll(() => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+    vi.mocked(fetchWithTimeout).mockResolvedValue({ ok: false } as Response);
+  });
+  afterEach(() => {
     vi.resetAllMocks();
+    vi.unstubAllGlobals();
   });
   it("should return gravatar URL for anthony@marmelab.com", async () => {
+    vi.mocked(fetch).mockResolvedValue({ ok: true } as Response);
     const email: EmailAndType[] = [
       { email: "anthony@marmelab.com", type: "Work" },
     ];
@@ -71,6 +77,9 @@ describe("getContactAvatar", () => {
   });
 
   it("should return gravatar URL for 2nd email if 1st email has no gravatar nor valid domain", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: false } as Response)
+      .mockResolvedValueOnce({ ok: true } as Response);
     const email: EmailAndType[] = [
       { email: "anthony@fake-domain-marmelab.com", type: "Work" },
       { email: "anthony@marmelab.com", type: "Work" },

@@ -18,6 +18,13 @@ const raSupabaseEnglishMessagesOverride = {
   "ra-supabase": {
     auth: {
       password_reset: "Check your emails for a Reset Password message.",
+      email_rate_limit:
+        "The authentication email sending limit has been reached. No email was sent. Wait for the server quota to reset before trying again. If this persists, contact your administrator to check the email service and limits.",
+      request_rate_limit: "Too many requests. Please wait before trying again.",
+      email_link_expired:
+        "This email link has expired or has already been used. Use the latest email or request a new link using Forgot password. Do not recreate the user.",
+      email_link_invalid:
+        "Email link verification failed. Please request a new link.",
     },
     oauth: {
       authorize: "Authorize Application",

@@ -8,6 +8,7 @@ import {
   useUpdate,
 } from "ra-core";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { DateField } from "@/components/admin/date-field";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export const Task = ({
             className="mt-1"
           />
           <div className={`flex-grow ${task.done_date ? "line-through" : ""}`}>
-            <div className="text-sm">
+            <div className="text-sm whitespace-pre-line">
               {task.type && task.type !== "none" && (
                 <>
                   <span className="font-semibold text-sm">
@@ -123,6 +124,15 @@ export const Task = ({
               )}
               {task.text}
             </div>
+            {task.recruitment_id != null && (
+              <Link
+                className="text-sm underline"
+                to={`/recruitment/${task.recruitment_id}`}
+                onClick={(event) => event.stopPropagation()}
+              >
+                查看招聘来源 / 安排下次跟进
+              </Link>
+            )}
             <div className="text-sm text-muted-foreground">
               {translate("resources.tasks.fields.due_short")}
               &nbsp;

@@ -127,8 +127,15 @@ async function updateSaleAvatar(user_id: string, avatar: string) {
 }
 
 async function inviteUser(req: Request, currentUserSale: any) {
-  const { email, password, first_name, last_name, disabled, administrator } =
-    await req.json();
+  const {
+    email,
+    password,
+    first_name,
+    last_name,
+    disabled,
+    administrator,
+    redirect_to,
+  } = await req.json();
 
   if (!currentUserSale.administrator) {
     return createErrorResponse(401, "Not Authorized");
@@ -223,7 +230,11 @@ async function inviteUser(req: Request, currentUserSale: any) {
       return createErrorResponse(500, "Internal Server Error");
     }
     const { error: emailError } =
-      await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+      await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        // Supabase Auth enforces its redirect URL allowlist. Without this,
+        // invitations silently fall back to the project's stale Site URL.
+        ...(typeof redirect_to === "string" ? { redirectTo: redirect_to } : {}),
+      });
 
     if (emailError) {
       console.error(`Error inviting user, email_error=${emailError}`);

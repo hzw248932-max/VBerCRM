@@ -18,6 +18,7 @@ create table public.companies (
     size smallint,
     linkedin_url text,
     website extensions.citext,
+    email text,
     phone_number text,
     address text,
     zipcode text,

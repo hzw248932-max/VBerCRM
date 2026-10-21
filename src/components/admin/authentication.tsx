@@ -110,6 +110,14 @@ export const AuthError = (props: AuthErrorProps) => {
         <Translate i18nKey={title} />
       </h1>
       <p className="my-5">{translate(message, { _: message })}</p>
+      {(message === "ra-supabase.auth.email_link_expired" ||
+        message === "ra-supabase.auth.email_link_invalid") && (
+        <Button asChild variant="outline" className="mb-4">
+          <Link to="/forgot-password">
+            {translate("ra-supabase.reset_password.forgot_password")}
+          </Link>
+        </Button>
+      )}
       <Button asChild>
         <Link to="/login">
           <LockIcon /> {translate("ra.auth.sign_in", { _: "Sign in" })}

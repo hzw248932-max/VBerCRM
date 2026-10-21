@@ -218,11 +218,19 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/recruitment/RecruitmentFollowUp.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/recruitment/Recruitment.tsx",
           "type": "registry:component"
         },
         {
           "path": "src/components/atomic-crm/recruitment/model.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/recruitment/followUp.ts",
           "type": "registry:component"
         },
         {

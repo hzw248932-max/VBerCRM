@@ -208,6 +208,12 @@ export const chineseSupabaseMessages = {
       reset_password: "重置密码",
       password_reset: "请查看邮箱中的密码重置邮件。",
       missing_tokens: "缺少访问令牌和刷新令牌",
+      email_link_expired:
+        "此邮件链接已过期或已使用。请使用最新邮件中的链接，或通过“忘记密码”重新获取设置密码链接。无需重复创建用户。",
+      email_link_invalid: "邮件链接验证失败，请重新获取链接后再试。",
+      email_rate_limit:
+        "认证邮件发送额度已用尽，本次未发送邮件。请等待服务端额度恢复后再试，不要连续提交；若持续发生，请联系管理员检查邮件发送服务和限额。",
+      request_rate_limit: "请求过于频繁，请稍后重试，不要连续提交。",
       back_to_login: "返回登录",
     },
     reset_password: {

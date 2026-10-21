@@ -133,7 +133,9 @@ describe("i18nProvider", () => {
   });
 
   it("updates the document language and tolerates unavailable storage", async () => {
-    vi.stubGlobal("document", { documentElement: { lang: "en" } });
+    // A real browser's document cannot be redefined. Only stub it in Node.
+    if (typeof document === "undefined")
+      vi.stubGlobal("document", { documentElement: { lang: "en" } });
     vi.stubGlobal("localStorage", {
       getItem: () => {
         throw new Error("blocked");

@@ -27,6 +27,7 @@ export function useCompanyImport(): ProcessImportBatch {
               size: sizeOf(row.size),
               linkedin_url: toText(row.linkedin_url),
               website: toText(row.website),
+              email: toText(row.email)?.trim(),
               phone_number: toText(row.phone_number),
               address: toText(row.address),
               zipcode: toText(row.zipcode),

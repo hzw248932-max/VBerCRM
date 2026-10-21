@@ -8,9 +8,13 @@ export async function completeEmailCallback(
   const params = new URLSearchParams(hash.split("?")[1] ?? "");
   const access_token = params.get("access_token");
   const refresh_token = params.get("refresh_token");
+  if (params.get("error_code") === "otp_expired") {
+    throw new Error("ra-supabase.auth.email_link_expired");
+  }
+  if (params.has("error") || params.has("error_code")) {
+    throw new Error("ra-supabase.auth.email_link_invalid");
+  }
   if (
-    params.has("error") ||
-    params.has("error_code") ||
     !access_token ||
     !refresh_token ||
     access_token === "null" ||

@@ -11,6 +11,16 @@ function setup() {
 }
 
 describe("email callbacks", () => {
+  it("explains expired invitations without reporting missing tokens", async () => {
+    const { client, setSession } = setup();
+    await expect(
+      completeEmailCallback(
+        client,
+        "#/auth-callback?error=access_denied&error_code=otp_expired",
+      ),
+    ).rejects.toThrow("ra-supabase.auth.email_link_expired");
+    expect(setSession).not.toHaveBeenCalled();
+  });
   it("establishes a confirmation session and explicitly opens the dashboard", async () => {
     const { client, setSession } = setup();
     expect(

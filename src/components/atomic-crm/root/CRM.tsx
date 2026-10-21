@@ -354,6 +354,7 @@ const MobileAdmin = (
         <Resource
           name="contacts"
           list={ContactListMobile}
+          create={contacts.create}
           show={ContactShow}
           recordRepresentation={contacts.recordRepresentation}
         >

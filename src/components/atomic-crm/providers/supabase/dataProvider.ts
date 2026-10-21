@@ -120,7 +120,13 @@ const getDataProviderWithCustomMethods = () => {
         data: Sale;
       }>("users", {
         method: "POST",
-        body,
+        body: {
+          ...body,
+          redirect_to: new URL(
+            `${import.meta.env.BASE_URL}auth-callback.html`,
+            window.location.origin,
+          ).href,
+        },
       });
 
       if (!data || error) {

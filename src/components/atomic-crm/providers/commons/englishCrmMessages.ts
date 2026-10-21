@@ -8,6 +8,7 @@ export const englishCrmMessages = {
         website: "Website",
         linkedin_url: "LinkedIn URL",
         phone_number: "Phone number",
+        email: "Company email",
         created_at: "Created at",
         nb_contacts: "Number of contacts",
         revenue: "Revenue",

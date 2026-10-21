@@ -10,6 +10,7 @@ export const chineseCrmMessages = {
         website: "网站",
         linkedin_url: "LinkedIn 链接",
         phone_number: "电话号码",
+        email: "公司邮箱",
         created_at: "创建时间",
         nb_contacts: "联系人数",
         revenue: "营收",

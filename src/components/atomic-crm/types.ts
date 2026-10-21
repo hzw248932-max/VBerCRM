@@ -52,6 +52,7 @@ export type Sale = {
 } & Pick<RaRecord, "id">;
 
 export type Company = {
+  email?: string | null;
   name: string;
   logo: RAFile;
   sector: string;
@@ -148,6 +149,7 @@ export type Tag = {
 };
 
 export type Task = {
+  recruitment_id?: Identifier | null;
   contact_id: Identifier;
   type: string;
   text: string;

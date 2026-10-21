@@ -41,6 +41,21 @@ const TASK_MARKED_AS_DONE = "TASK_MARKED_AS_DONE";
 const TASK_MARKED_AS_UNDONE = "TASK_MARKED_AS_UNDONE";
 const TASK_DONE_NOT_CHANGED = "TASK_DONE_NOT_CHANGED";
 
+// Match the database's one-open-follow-up constraint in demo mode as well.
+const checkOpenRecruitmentTask = async (
+  task: Partial<Task>,
+  provider: DataProvider,
+) => {
+  if (task.recruitment_id == null || task.done_date != null) return;
+  const { data } = await provider.getList<Task>("tasks", {
+    filter: { recruitment_id: task.recruitment_id, "done_date@is": null },
+    pagination: { page: 1, perPage: 2 },
+    sort: { field: "id", order: "ASC" },
+  });
+  if (data.some((existing) => String(existing.id) !== String(task.id)))
+    throw new Error("该线索已有未完成的任务，请先处理现有任务。");
+};
+
 const processCompanyLogo = async (params: any) => {
   let logo = params.data.logo;
 
@@ -494,10 +509,13 @@ export const createDataProvider = ({
       } satisfies ResourceCallbacks<Contact>,
       {
         resource: "tasks",
-        beforeCreate: async (params) => ({
-          ...params,
-          data: { ...params.data, created_at: new Date().toISOString() },
-        }),
+        beforeCreate: async (params, provider) => {
+          await checkOpenRecruitmentTask(params.data, provider);
+          return {
+            ...params,
+            data: { ...params.data, created_at: new Date().toISOString() },
+          };
+        },
         afterCreate: async (result, dataProvider) => {
           // update the task count in the related contact
           const { contact_id } = result.data;
@@ -513,8 +531,12 @@ export const createDataProvider = ({
           });
           return result;
         },
-        beforeUpdate: async (params) => {
+        beforeUpdate: async (params, provider) => {
           const { data, previousData } = params;
+          await checkOpenRecruitmentTask(
+            { ...previousData, ...data, id: params.id },
+            provider,
+          );
           if (previousData.done_date !== data.done_date) {
             taskUpdateType = data.done_date
               ? TASK_MARKED_AS_DONE

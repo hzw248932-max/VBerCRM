@@ -12,6 +12,7 @@ interface FormData {
 
 export const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
+  const [rateLimitMessage, setRateLimitMessage] = useState<string | null>(null);
 
   const notify = useNotify();
   const redirect = useRedirect();
@@ -26,10 +27,27 @@ export const ForgotPasswordPage = () => {
   const submit = async (values: FormData) => {
     try {
       setLoading(true);
+      setRateLimitMessage(null);
       await resetPassword({
         email: values.email,
+        redirectTo: new URL(
+          `${import.meta.env.BASE_URL}auth-callback.html`,
+          window.location.origin,
+        ).href,
       });
     } catch (error: any) {
+      const message = typeof error === "string" ? error : error?.message;
+      if (
+        error?.code === "over_email_send_rate_limit" ||
+        /email rate limit exceeded/i.test(message ?? "")
+      ) {
+        setRateLimitMessage("ra-supabase.auth.email_rate_limit");
+        return;
+      }
+      if (error?.status === 429 || error?.code === "over_request_rate_limit") {
+        setRateLimitMessage("ra-supabase.auth.request_rate_limit");
+        return;
+      }
       notify(
         typeof error === "string"
           ? error
@@ -67,6 +85,14 @@ export const ForgotPasswordPage = () => {
           })}
         </p>
       </div>
+      {rateLimitMessage && (
+        <p
+          role="alert"
+          className="rounded-md border border-amber-500 bg-amber-50 p-3 text-sm text-amber-950"
+        >
+          {translate(rateLimitMessage)}
+        </p>
+      )}
       <Form<FormData>
         className="space-y-8"
         onSubmit={submit as SubmitHandler<FieldValues>}

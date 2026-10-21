@@ -34,6 +34,7 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
         .replace(regex, "_")}`,
       website: internet.url(),
       phone_number: phone.phoneNumber(),
+      email: null,
       address: address.streetAddress(),
       zipcode: address.zipCode(),
       city: address.city(),

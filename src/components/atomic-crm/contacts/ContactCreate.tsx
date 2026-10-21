@@ -1,5 +1,6 @@
 import { CreateBase, Form, useGetIdentity, type MutationMode } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLocation } from "react-router";
 
 import { ContactInputs } from "./ContactInputs";
 import { FormToolbar } from "../layout/FormToolbar";
@@ -15,10 +16,16 @@ export const ContactCreate = ({
   mutationMode?: MutationMode;
 }) => {
   const { identity } = useGetIdentity();
+  const { state } = useLocation();
+  const recruitmentReturnId = state?.recruitmentReturnId;
 
   return (
     <CreateBase
-      redirect="show"
+      redirect={
+        recruitmentReturnId != null
+          ? `/recruitment/${encodeURIComponent(String(recruitmentReturnId))}`
+          : "show"
+      }
       transform={cleanupContactForCreate}
       mutationMode={mutationMode}
     >

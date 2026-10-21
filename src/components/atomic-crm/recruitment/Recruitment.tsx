@@ -12,6 +12,7 @@ import {
   type Identifier,
 } from "ra-core";
 import { Link } from "react-router";
+import { RecruitmentFollowUp } from "./RecruitmentFollowUp";
 import { ArrayInput } from "@/components/admin/array-input";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { BooleanInput } from "@/components/admin/boolean-input";
@@ -199,6 +200,19 @@ export const RecruitmentList = () => (
           <DataTable.Col source="status" label="推广状态">
             <Status />
           </DataTable.Col>
+          <DataTable.Col
+            label="跟进"
+            disableSort
+            render={(record) => (
+              <Link
+                className="underline whitespace-nowrap"
+                to={`/recruitment/${record.id}`}
+                onClick={(event) => event.stopPropagation()}
+              >
+                安排 / 查看跟进
+              </Link>
+            )}
+          />
         </DataTable>
       </div>
     </List>
@@ -354,6 +368,7 @@ export const RecruitmentEdit = () => (
   <EditBase mutationMode="pessimistic" redirect="list">
     <div className="max-w-4xl mx-auto p-4 pb-24">
       <h1 className="text-2xl font-semibold mb-4">编辑招聘信号</h1>
+      <RecruitmentFollowUp />
       <Card>
         <CardContent>
           <Form validate={validateRecruitment}>
@@ -402,6 +417,7 @@ export const CompanyRecruitment = ({
           {record ? "查看 / 编辑招聘信号" : "添加招聘信号"}
         </Link>
       </Button>
+      {record && <RecruitmentFollowUp record={record} />}
     </div>
   );
 };

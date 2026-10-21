@@ -1,4 +1,4 @@
-import { Globe, Linkedin, Phone } from "lucide-react";
+import { Globe, Linkedin, Mail, Phone } from "lucide-react";
 import {
   useGetIdentity,
   useLocaleState,
@@ -61,7 +61,12 @@ export const CompanyAside = ({ link = "edit" }: CompanyAsideProps) => {
 
 export const CompanyInfo = ({ record }: { record: Company }) => {
   const translate = useTranslate();
-  if (!record.website && !record.linkedin_url && !record.phone_number) {
+  if (
+    !record.website &&
+    !record.linkedin_url &&
+    !record.phone_number &&
+    !record.email
+  ) {
     return null;
   }
 
@@ -100,6 +105,14 @@ export const CompanyInfo = ({ record }: { record: Company }) => {
         <div className="flex flex-row items-center gap-1 min-h-[24px]">
           <Phone className="w-4 h-4" />
           <TextField source="phone_number" />
+        </div>
+      )}
+      {record.email && (
+        <div className="flex flex-row items-center gap-1 min-h-[24px]">
+          <Mail className="w-4 h-4 shrink-0" />
+          <a className="underline break-all" href={`mailto:${record.email}`}>
+            {record.email}
+          </a>
         </div>
       )}
     </AsideSection>
