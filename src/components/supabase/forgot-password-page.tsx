@@ -32,7 +32,7 @@ export const ForgotPasswordPage = () => {
         email: values.email,
         redirectTo: new URL(
           `${import.meta.env.BASE_URL}auth-callback.html`,
-          window.location.origin,
+          window.location.href,
         ).href,
       });
     } catch (error: any) {

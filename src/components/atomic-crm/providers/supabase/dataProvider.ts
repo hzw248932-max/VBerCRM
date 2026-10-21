@@ -124,7 +124,7 @@ const getDataProviderWithCustomMethods = () => {
           ...body,
           redirect_to: new URL(
             `${import.meta.env.BASE_URL}auth-callback.html`,
-            window.location.origin,
+            window.location.href,
           ).href,
         },
       });
