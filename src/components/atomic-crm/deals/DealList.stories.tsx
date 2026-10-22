@@ -58,3 +58,23 @@ export const NonAdminAccountManagerFilter = () => (
     </ResourceContextProvider>
   </StoryWrapper>
 );
+
+export const PaginatedDeals = () => (
+  <StoryWrapper
+    data={{
+      ...dataForAccountManagerFilter,
+      deals: Array.from({ length: 26 }, (_, index) =>
+        buildDeal({
+          id: index + 1,
+          index,
+          name: `Paged deal ${index + 1}`,
+          sales_id: 0,
+        }),
+      ),
+    }}
+  >
+    <ResourceContextProvider value="deals">
+      <DealList />
+    </ResourceContextProvider>
+  </StoryWrapper>
+);

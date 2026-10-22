@@ -2,6 +2,8 @@ import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import isEqual from "lodash/isEqual";
 import { useDataProvider, useListContext, type DataProvider } from "ra-core";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCompanyCounts } from "./companyCounts";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
@@ -11,12 +13,28 @@ import { getDealsByStage } from "./stages";
 
 export const DealListContent = () => {
   const { dealStages } = useConfigurationContext();
-  const { data: unorderedDeals, isPending, refetch } = useListContext<Deal>();
+  const {
+    data: unorderedDeals,
+    isPending,
+    refetch,
+    filterValues,
+  } = useListContext<Deal>();
   const dataProvider = useDataProvider();
+  const countFilter = { ...filterValues, "archived_at@is": null };
+  const stages = dealStages.map((stage) => stage.value);
+  const { data: companyCounts, refetch: refetchCounts } = useQuery({
+    queryKey: ["deals", "companyCounts", countFilter, stages],
+    queryFn: () => getCompanyCounts(dataProvider, countFilter, stages),
+  });
 
   const [dealsByStage, setDealsByStage] = useState<DealsByStage>(
     getDealsByStage([], dealStages),
   );
+
+  // List mutations (create/edit/archive) refresh list data; refresh totals too.
+  useEffect(() => {
+    if (unorderedDeals) void refetchCounts();
+  }, [unorderedDeals, refetchCounts]);
 
   useEffect(() => {
     if (unorderedDeals) {
@@ -67,6 +85,7 @@ export const DealListContent = () => {
     // persist the changes
     updateDealStage(sourceDeal, destinationDeal, dataProvider).then(() => {
       refetch();
+      refetchCounts();
     });
   };
 
@@ -77,6 +96,7 @@ export const DealListContent = () => {
           <DealColumn
             stage={stage.value}
             deals={dealsByStage[stage.value]}
+            companyCount={companyCounts?.[stage.value]}
             key={stage.value}
           />
         ))}

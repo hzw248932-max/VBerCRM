@@ -159,6 +159,7 @@ export const chineseCrmMessages = {
       },
     },
     deals: {
+      company_count: "%{count} 家公司",
       name: "商机",
       fields: {
         name: "名称",

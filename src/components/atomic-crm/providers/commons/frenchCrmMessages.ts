@@ -182,6 +182,7 @@ export const frenchCrmMessages = {
       },
     },
     deals: {
+      company_count: "%{count} entreprises",
       name: "Affaire |||| Affaires",
       fields: {
         name: "Nom",

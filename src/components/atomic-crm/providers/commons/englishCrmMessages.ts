@@ -178,6 +178,7 @@ export const englishCrmMessages = {
       },
     },
     deals: {
+      company_count: "%{count} companies",
       name: "Deal |||| Deals",
       fields: {
         name: "Name",

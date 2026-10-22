@@ -11,6 +11,7 @@ import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
+import { ListPagination } from "@/components/admin/list-pagination";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { FilterButton } from "@/components/admin/filter-form";
 import { SearchInput } from "@/components/admin/search-input";
@@ -70,13 +71,13 @@ const DealList = () => {
 
   return (
     <List
-      perPage={100}
+      perPage={25}
       filter={{ "archived_at@is": null }}
       title={false}
       sort={{ field: "index", order: "DESC" }}
       filters={dealFilters}
       actions={<DealActions />}
-      pagination={null}
+      pagination={<ListPagination rowsPerPageOptions={[10, 25, 50, 100]} />}
     >
       <DealLayout />
     </List>

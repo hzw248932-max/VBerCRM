@@ -9,12 +9,13 @@ import { DealCard } from "./DealCard";
 export const DealColumn = ({
   stage,
   deals,
+  companyCount,
 }: {
   stage: string;
   deals: Deal[];
+  companyCount?: number;
 }) => {
-  const totalAmount = deals.reduce((sum, deal) => sum + deal.amount, 0);
-  const { dealStages, currency } = useConfigurationContext();
+  const { dealStages } = useConfigurationContext();
   const translate = useTranslate();
   const stageLabel = findDealLabel(dealStages, stage) ?? stage;
   return (
@@ -24,13 +25,11 @@ export const DealColumn = ({
           {translate(stageLabel, { _: stageLabel })}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {totalAmount.toLocaleString("en-US", {
-            notation: "compact",
-            style: "currency",
-            currency,
-            currencyDisplay: "narrowSymbol",
-            minimumSignificantDigits: 3,
-          })}
+          {companyCount == null
+            ? "—"
+            : translate("resources.deals.company_count", {
+                count: companyCount,
+              })}
         </p>
       </div>
       <Droppable droppableId={stage}>
