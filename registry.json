@@ -682,6 +682,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/deals/companyCounts.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/dataImport/useImportableResources.ts",
           "type": "registry:component"
         },
