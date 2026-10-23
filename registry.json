@@ -194,6 +194,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/sales/OwnerInput.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/sales/index.ts",
           "type": "registry:component"
         },
@@ -239,6 +243,10 @@
         },
         {
           "path": "src/components/atomic-crm/providers/supabase/supabase.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/providers/supabase/initialization.ts",
           "type": "registry:component"
         },
         {
@@ -395,6 +403,26 @@
         },
         {
           "path": "src/components/atomic-crm/providers/commons/activity.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/operations/RestorePanel.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/operations/restore.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/operations/OperationsPage.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/operations/OperationsLink.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/operations/data.ts",
           "type": "registry:component"
         },
         {
@@ -703,6 +731,10 @@
         },
         {
           "path": "src/components/atomic-crm/dataImport/types.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/dataImport/preflight.ts",
           "type": "registry:component"
         },
         {
