@@ -1,3 +1,4 @@
+import { OperationsLink } from "../operations/OperationsLink";
 import { useGetList, useTimeout } from "ra-core";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -29,7 +30,10 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
           <h1 className="text-xl font-semibold">{title}</h1>
         </div>
       </MobileHeader>
-      <MobileContent>{children}</MobileContent>
+      <MobileContent>
+        <OperationsLink />
+        {children}
+      </MobileContent>
     </>
   );
 };

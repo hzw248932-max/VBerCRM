@@ -66,11 +66,29 @@ export const authProvider: AuthProvider = {
     // Get the current user
     const userItem = localStorage.getItem(USER_STORAGE_KEY);
     const localUser = userItem ? (JSON.parse(userItem) as Sale) : null;
-    if (!localUser) return false;
+    if (!localUser || localUser.disabled) return false;
 
     // Compute access rights from the sale role
     const role = localUser.administrator ? "admin" : "user";
-    return canAccess(role, params);
+    let record = params.record;
+    const parent = (
+      {
+        recruitment: ["companies", "company_id"],
+        contact_notes: ["contacts", "contact_id"],
+        deal_notes: ["deals", "deal_id"],
+      } as Record<string, string[]>
+    )[params.resource];
+    if (role !== "admin" && parent && record) {
+      try {
+        const { data } = await dataProvider.getOne(parent[0], {
+          id: record[parent[1]],
+        });
+        record = { ...record, sales_id: data.sales_id };
+      } catch {
+        return false;
+      }
+    }
+    return canAccess(role, { ...params, record }, localUser.id);
   },
   getIdentity: () => {
     const userItem = localStorage.getItem(USER_STORAGE_KEY);

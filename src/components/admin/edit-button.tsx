@@ -4,6 +4,7 @@ import { Pencil } from "lucide-react";
 import type { RaRecord } from "ra-core";
 import {
   useCreatePath,
+  useCanAccess,
   useGetRecordRepresentation,
   useGetResourceLabel,
   useRecordContext,
@@ -43,6 +44,11 @@ export const EditButton = (props: EditButtonProps) => {
   const { label: labelProp } = props;
   const resource = useResourceContext(props);
   const record = useRecordContext(props);
+  const { canAccess } = useCanAccess({
+    resource: resource!,
+    action: "edit",
+    record,
+  });
   const createPath = useCreatePath();
   const getResourceLabel = useGetResourceLabel();
   const getRecordRepresentation = useGetRecordRepresentation(resource);
@@ -65,6 +71,7 @@ export const EditButton = (props: EditButtonProps) => {
     },
     userText: labelProp,
   });
+  if (!canAccess) return null;
   return (
     <Link
       className={buttonVariants({ variant: "outline" })}

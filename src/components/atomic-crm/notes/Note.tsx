@@ -7,6 +7,7 @@ import {
   useResourceContext,
   useTranslate,
   useUpdate,
+  useCanAccess,
 } from "ra-core";
 import { useEffect, useRef, useState } from "react";
 import type { FieldValues, SubmitHandler } from "react-hook-form";
@@ -44,6 +45,11 @@ export const Note = ({
   const [isTruncated, setTruncated] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const resource = useResourceContext();
+  const { canAccess } = useCanAccess({
+    resource: resource!,
+    action: "edit",
+    record: note,
+  });
   const notify = useNotify();
   const translate = useTranslate();
   const { identity } = useGetIdentity();
@@ -123,7 +129,7 @@ export const Note = ({
             <Status className="ml-2" status={note.status} />
           )}
         </div>
-        <span className={`${isHover ? "visible" : "invisible"}`}>
+        <span className={`${isHover && canAccess ? "visible" : "invisible"}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

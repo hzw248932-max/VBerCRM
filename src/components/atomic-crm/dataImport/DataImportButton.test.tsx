@@ -326,6 +326,7 @@ describe("DataImportButton", () => {
       );
     await screen.getByRole("button", { name: "Start import" }).click();
 
+    await screen.getByRole("button", { name: "确认提醒并导入" }).click();
     await expect.element(screen.getByText(/Import complete/)).toBeVisible();
 
     const { data: companies } = await listAll(dataProvider, "companies");
@@ -359,6 +360,7 @@ describe("DataImportButton", () => {
       );
     await screen.getByRole("button", { name: "Start import" }).click();
 
+    await screen.getByRole("button", { name: "确认提醒并导入" }).click();
     await expect.element(screen.getByText(/Import complete/)).toBeVisible();
 
     const { data: contacts } = await listAll(dataProvider, "contacts");
@@ -383,7 +385,7 @@ describe("DataImportButton", () => {
           ...dataProvider,
           // `name` is NOT NULL in the database
           create: (resource, params) =>
-            resource === "companies" && params.data.name === undefined
+            resource === "companies" && params.data.name === "Rejected"
               ? Promise.reject(new Error("null value in column name"))
               : dataProvider.create(resource, params),
         }}
@@ -399,12 +401,13 @@ describe("DataImportButton", () => {
         csvFile("companies.csv", [
           "name,city",
           "Acme,New York",
-          ",Boston",
+          "Rejected,Boston",
           "Globex,Paris",
         ]),
       );
     await screen.getByRole("button", { name: "Start import" }).click();
 
+    await screen.getByRole("button", { name: "确认提醒并导入" }).click();
     // A rejected row used to fail the accounting of its whole batch, so users
     // re-imported a file whose records had in fact been created
     await expect
@@ -416,4 +419,34 @@ describe("DataImportButton", () => {
     const { data: companies } = await listAll(dataProvider, "companies");
     expect(companies.map(({ name }) => name)).toEqual(["Acme", "Globex"]);
   });
+});
+
+it("blocks the entire file before writes when a company email is invalid", async () => {
+  const dataProvider = createDataProvider({
+    db: createCrmDb(),
+    latency: 0,
+    silent: true,
+  });
+  const screen = await render(
+    <StoryWrapper dataProvider={dataProvider}>
+      <DataImportButton resource="companies" />
+    </StoryWrapper>,
+  );
+  await screen.getByRole("button", { name: "Import CSV" }).click();
+  await screen
+    .getByLabelText("CSV File")
+    .upload(
+      csvFile("companies.csv", [
+        "name,country,email",
+        "Valid,CN,a@example.com",
+        "Invalid,CN,bad-address",
+      ]),
+    );
+  await screen.getByRole("button", { name: "Start import" }).click();
+  await expect
+    .element(
+      screen.getByText("第 3 行：email 邮箱格式不正确。", { exact: true }),
+    )
+    .toBeVisible();
+  expect((await listAll(dataProvider, "companies")).data).toHaveLength(0);
 });

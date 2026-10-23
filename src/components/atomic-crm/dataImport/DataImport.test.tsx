@@ -15,8 +15,11 @@ import { DataImportButton } from "./DataImportButton";
 const ROW_COUNT = 80;
 
 const csv = [
-  "first_name,last_name",
-  ...Array.from({ length: ROW_COUNT }, (_, index) => `Ada${index},Lovelace`),
+  "first_name,last_name,email_work",
+  ...Array.from(
+    { length: ROW_COUNT },
+    (_, index) => `Ada${index},Lovelace,ada${index}@example.test`,
+  ),
 ].join("\n");
 
 let createDelay = 200;

@@ -341,7 +341,13 @@ export const frenchCrmMessages = {
       },
       empty: "Aucune tâche pour l'instant",
       empty_list_hint: "Les tâches ajoutées à vos contacts apparaîtront ici.",
+      completed_on: "Terminée le",
+      load_error: "Impossible de charger les tâches. Réessayez.",
+      loaded_count: "%{loaded} sur %{total} affichées",
+      no_completed: "Aucun suivi terminé",
       filters: {
+        pending: "À suivre",
+        completed: "Terminées",
         later: "Plus tard",
         overdue: "En retard",
         this_week: "Cette semaine",

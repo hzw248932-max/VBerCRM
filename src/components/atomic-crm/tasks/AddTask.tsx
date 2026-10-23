@@ -9,6 +9,7 @@ import {
   useRecordContext,
   useTranslate,
   useUpdate,
+  useAuthProvider,
 } from "ra-core";
 import { useMemo, useState } from "react";
 import { SaveButton } from "@/components/admin/form";
@@ -38,6 +39,7 @@ export const AddTask = ({
 }) => {
   const { identity } = useGetIdentity();
   const dataProvider = useDataProvider();
+  const authProvider = useAuthProvider();
   const [update] = useUpdate();
   const notify = useNotify();
   const translate = useTranslate();
@@ -65,11 +67,18 @@ export const AddTask = ({
     });
     if (!contact.data) return;
 
-    await update("contacts", {
-      id: contact.data.id,
-      data: { last_seen: new Date().toISOString() },
-      previousData: contact.data,
-    });
+    if (
+      await authProvider?.canAccess?.({
+        resource: "contacts",
+        action: "edit",
+        record: contact.data,
+      })
+    )
+      await update("contacts", {
+        id: contact.data.id,
+        data: { last_seen: new Date().toISOString() },
+        previousData: contact.data,
+      });
 
     notify("resources.tasks.added");
   };

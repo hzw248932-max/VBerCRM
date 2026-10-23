@@ -5,6 +5,7 @@ import {
   useGetIdentity,
   useGetOne,
   useTranslate,
+  useCanAccess,
 } from "ra-core";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
@@ -35,6 +36,11 @@ export const NoteShowPage = () => {
     id: noteId!,
   });
   const { identity } = useGetIdentity();
+  const { canAccess } = useCanAccess({
+    resource: "contact_notes",
+    action: "edit",
+    record: note,
+  });
   const isCurrentUser = note?.sales_id === identity?.id;
   const salesName = useGetSalesName(note?.sales_id, {
     enabled: note && !isCurrentUser,
@@ -74,6 +80,7 @@ export const NoteShowPage = () => {
           </Link>
         </div>
         <Button
+          disabled={!canAccess}
           type="button"
           variant="ghost"
           size="icon"

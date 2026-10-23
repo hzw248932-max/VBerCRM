@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { inspectImport } from "./preflight";
+import { useEffect, useState, useRef } from "react";
 import {
   Form,
+  useDataProvider,
   useGetResourceLabel,
   useResourceTranslation,
   useTranslate,
@@ -48,11 +50,21 @@ export function DataImportDialog({
   onClose,
 }: DataImportDialogProps) {
   const translate = useTranslate();
+  const provider = useDataProvider();
+  const generation = useRef(0);
+  const [checking, setChecking] = useState(false);
+  const [check, setCheck] = useState<Awaited<
+    ReturnType<typeof inspectImport>
+  > | null>(null);
+  const [checkError, setCheckError] = useState("");
   const getResourceLabel = useGetResourceLabel();
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
+    generation.current++;
     setFile(null);
+    setCheck(null);
+    setCheckError("");
   }, [resource.name, open]);
 
   // Importing a single resource names the dialog after it, falling back to the
@@ -73,13 +85,34 @@ export function DataImportDialog({
     onResourceChange(next.name);
   };
 
-  const handleStart = () => {
-    if (!file) return;
-    onStart(file);
+  const handleStart = async () => {
+    if (!file || checking) return;
+    const request = ++generation.current;
+    setChecking(true);
+    setCheckError("");
+    try {
+      const result = await inspectImport(file, resource.name, provider);
+      if (request !== generation.current) return;
+      setCheck(result);
+      if (
+        !result.errors.length &&
+        (!result.warnings.length ||
+          check?.warnings.join() === result.warnings.join())
+      )
+        onStart(file);
+    } catch (e) {
+      if (request !== generation.current) return;
+      setCheckError(e instanceof Error ? e.message : "导入检查失败");
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && !checking && onClose()}
+    >
       <DialogContent className="max-w-[calc(100%-2rem)] gap-6 p-6 sm:max-w-2xl sm:p-8">
         {/* Remount the form on resource change so no file survives the switch */}
         <Form key={resource.name} className="flex flex-col gap-6">
@@ -96,6 +129,7 @@ export function DataImportDialog({
                 <Select
                   value={resource.name}
                   onValueChange={handleResourceChange}
+                  disabled={checking}
                 >
                   <SelectTrigger id="data-import-resource" className="w-full">
                     <SelectValue />
@@ -126,17 +160,43 @@ export function DataImportDialog({
               source="csv"
               label="crm.data_import.csv_file"
               accept={{ "text/csv": [".csv"] }}
-              onChange={setFile}
+              onChange={(value) => {
+                setFile(value);
+                setCheck(null);
+                setCheckError("");
+              }}
+              disabled={checking}
             >
               <FileField source="src" title="title" target="_blank" />
             </FileInput>
           </div>
         </Form>
 
+        {checkError && <p role="alert">{checkError}</p>}
+        {check && (
+          <div className="max-h-48 overflow-auto text-sm" role="status">
+            <p>
+              检查 {check.rows} 行：{check.errors.length} 项错误，
+              {check.warnings.length} 项提醒。
+            </p>
+            {[...check.errors, ...check.warnings]
+              .slice(0, 50)
+              .map((message, i) => (
+                <p key={i}>{message}</p>
+              ))}
+            {check.errors.length + check.warnings.length > 50 && (
+              <p>仅显示前 50 项，请修正文件后重新选择。</p>
+            )}
+          </div>
+        )}
         <div className="flex justify-start">
           <FormToolbar>
-            <Button onClick={handleStart} disabled={!file}>
-              {translate("crm.data_import.start")}
+            <Button onClick={handleStart} disabled={!file || checking}>
+              {checking
+                ? "正在检查…"
+                : check && !check.errors.length && check.warnings.length
+                  ? "确认提醒并导入"
+                  : translate("crm.data_import.start")}
             </Button>
           </FormToolbar>
         </div>

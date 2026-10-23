@@ -8,6 +8,7 @@ import {
   useResourceContext,
   useTranslate,
   useUpdate,
+  useCanAccess,
   type Identifier,
   type RaRecord,
 } from "ra-core";
@@ -30,9 +31,14 @@ export const NoteCreate = ({
 }) => {
   const resource = useResourceContext();
   const record = useRecordContext();
+  const { canAccess } = useCanAccess({
+    resource: reference,
+    action: "edit",
+    record,
+  });
   const { identity } = useGetIdentity();
 
-  if (!record || !identity) return null;
+  if (!record || !identity || !canAccess) return null;
 
   const defaultStatus = reference === "contacts" ? record.status : undefined;
 

@@ -10,6 +10,7 @@ import {
   useRecordContext,
   useResourceContext,
   useTranslate,
+  useCanAccess,
 } from "ra-core";
 
 export type DeleteButtonProps = {
@@ -60,6 +61,11 @@ export const DeleteButton = (props: DeleteButtonProps) => {
   } = props;
   const record = useRecordContext(props);
   const resource = useResourceContext(props);
+  const { canAccess } = useCanAccess({
+    resource: resource!,
+    action: "delete",
+    record,
+  });
 
   const { isPending, handleDelete } = useDeleteWithUndoController({
     record,
@@ -96,6 +102,7 @@ export const DeleteButton = (props: DeleteButtonProps) => {
     userText: labelProp,
   });
 
+  if (!canAccess) return null;
   return (
     <Button
       variant={variant}

@@ -1,5 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
-import { useRedirect, RecordContextProvider } from "ra-core";
+import { useRedirect, RecordContextProvider, useCanAccess } from "ra-core";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { NumberField } from "@/components/admin/number-field";
 import { SelectField } from "@/components/admin/select-field";
@@ -10,10 +10,19 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 
 export const DealCard = ({ deal, index }: { deal: Deal; index: number }) => {
+  const { canAccess } = useCanAccess({
+    resource: "deals",
+    action: "edit",
+    record: deal,
+  });
   if (!deal) return null;
 
   return (
-    <Draggable draggableId={String(deal.id)} index={index}>
+    <Draggable
+      draggableId={String(deal.id)}
+      index={index}
+      isDragDisabled={!canAccess}
+    >
       {(provided, snapshot) => (
         <DealCardContent provided={provided} snapshot={snapshot} deal={deal} />
       )}

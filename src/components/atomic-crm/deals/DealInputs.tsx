@@ -12,12 +12,14 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
+import { OwnerInput } from "../sales/OwnerInput";
 
 export const DealInputs = () => {
   const isMobile = useIsMobile();
   return (
     <div className="flex flex-col gap-8">
       <DealInfoInputs />
+      <OwnerInput />
 
       <div className={`flex gap-6 ${isMobile ? "flex-col" : "flex-row"}`}>
         <DealLinkedToInputs />

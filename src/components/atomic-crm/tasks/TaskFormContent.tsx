@@ -2,8 +2,9 @@ import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { TextInput } from "@/components/admin/text-input";
-import { required } from "ra-core";
+import { required, useRecordContext } from "ra-core";
 import { DateTimeInput } from "@/components/admin";
+import { OwnerInput } from "../sales/OwnerInput";
 
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
@@ -14,8 +15,10 @@ export const TaskFormContent = ({
   selectContact?: boolean;
 }) => {
   const { taskTypes } = useConfigurationContext();
+  const record = useRecordContext();
   return (
     <div className="flex flex-col gap-4">
+      {record?.id != null && <OwnerInput />}
       <TextInput
         autoFocus
         source="text"

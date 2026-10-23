@@ -336,7 +336,13 @@ export const englishCrmMessages = {
       },
       empty: "No tasks yet",
       empty_list_hint: "Tasks added to your contacts will appear here.",
+      completed_on: "Completed on",
+      load_error: "Unable to load tasks. Please retry.",
+      loaded_count: "Showing %{loaded} of %{total}",
+      no_completed: "No completed follow-ups yet",
       filters: {
+        pending: "Pending",
+        completed: "Completed",
         later: "Later",
         overdue: "Overdue",
         this_week: "This week",

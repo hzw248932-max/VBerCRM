@@ -1,3 +1,4 @@
+import { OwnerInput } from "../sales/OwnerInput";
 import {
   email,
   required,
@@ -5,6 +6,7 @@ import {
   useTranslate,
   useUpdate,
   useNotify,
+  useCanAccess,
 } from "ra-core";
 import type { FocusEvent, ClipboardEventHandler } from "react";
 import { useFormContext } from "react-hook-form";
@@ -20,7 +22,7 @@ import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
 import { StatusSelector } from "../notes";
-import type { Sale, Contact } from "../types";
+import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
 import {
@@ -213,32 +215,22 @@ const ContactMiscInputs = () => {
       </h6>
       <TextInput source="background" multiline helperText={false} />
       <BooleanInput source="has_newsletter" helperText={false} />
-      <ReferenceInput
-        reference="sales"
-        source="sales_id"
-        sort={{ field: "last_name", order: "ASC" }}
-        filter={{
-          "disabled@neq": true,
-        }}
-      >
-        <SelectInput
-          helperText={false}
-          optionText={saleOptionRenderer}
-          validate={required()}
-        />
-      </ReferenceInput>
+      <OwnerInput />
     </div>
   );
 };
 
-const saleOptionRenderer = (choice: Sale) =>
-  `${choice.first_name} ${choice.last_name}`;
-
 export const ContactStatusSelector = () => {
   const record = useRecordContext<Contact>();
+  const { canAccess } = useCanAccess({
+    resource: "contacts",
+    action: "edit",
+    record,
+  });
   const [update] = useUpdate<Contact>();
   const notify = useNotify();
   if (!record) return null;
+  if (!canAccess) return <span className="text-sm">{record.status}</span>;
 
   const handleStatusChange = (nextStatus: string) => {
     if (nextStatus === record?.status) return;

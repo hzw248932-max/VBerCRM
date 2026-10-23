@@ -7,6 +7,7 @@ import {
   useNotify,
   useTranslate,
   useUpdate,
+  useAuthProvider,
 } from "ra-core";
 import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "../notes/foreignKeyMapping";
@@ -37,6 +38,7 @@ export const TaskCreateSheet = ({
   );
   const [update] = useUpdate();
   const dataProvider = useDataProvider();
+  const authProvider = useAuthProvider();
   const queryClient = useQueryClient();
   const notify = useNotify();
   const record = useMemo(
@@ -58,11 +60,18 @@ export const TaskCreateSheet = ({
       id: referenceRecordId,
     });
     if (!contact) return;
-    await update("contacts", {
-      id: referenceRecordId as unknown as Identifier,
-      data: { last_seen: new Date().toISOString() },
-      previousData: contact,
-    });
+    if (
+      await authProvider?.canAccess?.({
+        resource: "contacts",
+        action: "edit",
+        record: contact,
+      })
+    )
+      await update("contacts", {
+        id: referenceRecordId as unknown as Identifier,
+        data: { last_seen: new Date().toISOString() },
+        previousData: contact,
+      });
     queryClient.invalidateQueries({
       queryKey: ["contacts", "getOne"],
     });

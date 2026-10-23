@@ -1,3 +1,4 @@
+import { resolveInitialization } from "./initialization";
 import type { AuthProvider } from "ra-core";
 import { supabaseAuthProvider } from "ra-supabase-core";
 
@@ -25,7 +26,7 @@ const getBaseAuthProvider = () =>
 
 // Initialization is cached. Membership/roles are reloaded for every access check;
 // persisted identity data is never trusted as an authorization decision.
-const IS_INITIALIZED_CACHE_KEY = "RaStore.auth.is_initialized";
+const IS_INITIALIZED_CACHE_KEY = `RaStore.auth.is_initialized:${import.meta.env.VITE_SUPABASE_URL}`;
 const CURRENT_SALE_CACHE_KEY = "RaStore.auth.current_sale";
 
 function getLocalStorage(): Storage | null {
@@ -42,10 +43,10 @@ export async function getIsInitialized() {
     return cachedValue === "true";
   }
 
-  const { data } = await getSupabaseClient()
+  const { data, error } = await getSupabaseClient()
     .from("init_state")
     .select("is_initialized");
-  const isInitialized = data?.at(0)?.is_initialized > 0;
+  const isInitialized = resolveInitialization(data, error);
 
   if (isInitialized) {
     storage?.setItem(IS_INITIALIZED_CACHE_KEY, "true");
@@ -161,7 +162,24 @@ export const getAuthProvider = (): AuthProvider => {
 
       // Compute access rights from the sale role
       const role = sale.administrator ? "admin" : "user";
-      return canAccess(role, params);
+      let record = params.record;
+      const parent = (
+        {
+          recruitment: ["companies", "company_id"],
+          contact_notes: ["contacts", "contact_id"],
+          deal_notes: ["deals", "deal_id"],
+        } as Record<string, string[]>
+      )[params.resource];
+      if (role !== "admin" && parent && record) {
+        const { data, error } = await getSupabaseClient()
+          .from(parent[0])
+          .select("sales_id")
+          .eq("id", record[parent[1]])
+          .single();
+        if (error || !data) return false;
+        record = { ...record, sales_id: data.sales_id };
+      }
+      return canAccess(role, { ...params, record }, sale.id);
     },
     getAuthorizationDetails(authorizationId: string) {
       return getSupabaseClient().auth.oauth.getAuthorizationDetails(

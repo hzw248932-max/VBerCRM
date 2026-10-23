@@ -9,6 +9,7 @@ import {
   useNotify,
   useDataProvider,
   useListContext,
+  useCanAccess,
   type Identifier,
 } from "ra-core";
 import { Link } from "react-router";
@@ -365,20 +366,41 @@ export const RecruitmentCreate = () => {
   );
 };
 export const RecruitmentEdit = () => (
-  <EditBase mutationMode="pessimistic" redirect="list">
+  <EditBase mutationMode="pessimistic" redirect="list" disableAccessControl>
     <div className="max-w-4xl mx-auto p-4 pb-24">
       <h1 className="text-2xl font-semibold mb-4">编辑招聘信号</h1>
       <RecruitmentFollowUp />
       <Card>
         <CardContent>
           <Form validate={validateRecruitment}>
-            <Inputs editing />
+            <RecruitmentEditInputs />
           </Form>
         </CardContent>
       </Card>
     </div>
   </EditBase>
 );
+
+const RecruitmentEditInputs = () => {
+  const record = useRecordContext();
+  const { canAccess } = useCanAccess({
+    resource: "recruitment",
+    action: "edit",
+    record,
+  });
+  return (
+    <>
+      {!canAccess && (
+        <p className="mb-4 text-muted-foreground">
+          只读：仅公司负责人和管理员可修改招聘信号。
+        </p>
+      )}
+      <fieldset disabled={!canAccess}>
+        <Inputs editing />
+      </fieldset>
+    </>
+  );
+};
 
 export const CompanyRecruitment = ({
   companyId,

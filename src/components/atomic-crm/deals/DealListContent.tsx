@@ -1,6 +1,12 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import isEqual from "lodash/isEqual";
-import { useDataProvider, useListContext, type DataProvider } from "ra-core";
+import {
+  useDataProvider,
+  useListContext,
+  useCanAccess,
+  useNotify,
+  type DataProvider,
+} from "ra-core";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCompanyCounts } from "./companyCounts";
@@ -20,6 +26,11 @@ export const DealListContent = () => {
     filterValues,
   } = useListContext<Deal>();
   const dataProvider = useDataProvider();
+  const { canAccess: canAssign } = useCanAccess({
+    resource: "sales",
+    action: "list",
+  });
+  const notify = useNotify();
   const countFilter = { ...filterValues, "archived_at@is": null };
   const stages = dealStages.map((stage) => stage.value);
   const { data: companyCounts, refetch: refetchCounts } = useQuery({
@@ -83,10 +94,24 @@ export const DealListContent = () => {
     );
 
     // persist the changes
-    updateDealStage(sourceDeal, destinationDeal, dataProvider).then(() => {
-      refetch();
-      refetchCounts();
-    });
+    const save = canAssign
+      ? updateDealStage(sourceDeal, destinationDeal, dataProvider)
+      : dataProvider.update("deals", {
+          id: sourceDeal.id,
+          data: {
+            stage: destinationStage,
+            index: destinationDeal.index ?? sourceDeal.index,
+          },
+          previousData: sourceDeal,
+        });
+    save
+      .catch(() =>
+        notify("无权修改该商机，或保存失败，请刷新后重试。", { type: "error" }),
+      )
+      .finally(() => {
+        refetch();
+        refetchCounts();
+      });
   };
 
   return (

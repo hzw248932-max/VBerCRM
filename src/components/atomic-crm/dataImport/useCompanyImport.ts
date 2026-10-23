@@ -1,3 +1,4 @@
+import { normalizeCountry } from "./preflight";
 import { useCallback } from "react";
 import { useDataProvider, useGetIdentity } from "ra-core";
 
@@ -22,7 +23,7 @@ export function useCompanyImport(): ProcessImportBatch {
         batch.map((row) =>
           dataProvider.create("companies", {
             data: {
-              name: toText(row.name),
+              name: toText(row.name)?.trim(),
               sector: toConfiguredValue(row.sector, companySectors),
               size: sizeOf(row.size),
               linkedin_url: toText(row.linkedin_url),
@@ -33,7 +34,7 @@ export function useCompanyImport(): ProcessImportBatch {
               zipcode: toText(row.zipcode),
               city: toText(row.city),
               state_abbr: toText(row.state_abbr),
-              country: toText(row.country),
+              country: normalizeCountry(toText(row.country) ?? ""),
               description: toText(row.description),
               revenue: toText(row.revenue),
               tax_identifier: toText(row.tax_identifier),

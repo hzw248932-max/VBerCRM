@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { addDays } from "date-fns";
 import { MoreVertical } from "lucide-react";
 import {
   useDeleteWithUndoController,
@@ -6,6 +7,7 @@ import {
   useNotify,
   useTranslate,
   useUpdate,
+  useCanAccess,
 } from "ra-core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -34,6 +36,11 @@ export const Task = ({
   showContact?: boolean;
 }) => {
   const isMobile = useIsMobile();
+  const { canAccess: canEdit } = useCanAccess({
+    resource: "tasks",
+    action: "edit",
+    record: task,
+  });
   const { taskTypes } = useConfigurationContext();
   const notify = useNotify();
   const translate = useTranslate();
@@ -65,6 +72,7 @@ export const Task = ({
   };
 
   const handleCheck = () => () => {
+    if (!canEdit) return;
     update("tasks", {
       id: task.id,
       data: {
@@ -75,16 +83,12 @@ export const Task = ({
   };
 
   useEffect(() => {
-    // We do not want to invalidate the query when a tack is checked or unchecked
-    if (
-      isUpdatePending ||
-      !isSuccess ||
-      variables?.data?.done_date != undefined
-    ) {
+    if (isUpdatePending || !isSuccess) {
       return;
     }
 
     queryClient.invalidateQueries({ queryKey: ["tasks", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["tasks", "getInfiniteList"] });
   }, [queryClient, isUpdatePending, isSuccess, variables]);
 
   const labelId = `checkbox-list-label-${task.id}`;
@@ -102,7 +106,7 @@ export const Task = ({
             onClick={(event) => event.stopPropagation()}
             checked={!!task.done_date}
             onCheckedChange={handleCheck()}
-            disabled={isUpdatePending}
+            disabled={isUpdatePending || !canEdit}
             className="mt-1"
           />
           <div className={`flex-grow ${task.done_date ? "line-through" : ""}`}>
@@ -136,9 +140,18 @@ export const Task = ({
               </Link>
             )}
             <div className="text-sm text-muted-foreground">
-              {translate("resources.tasks.fields.due_short")}
+              {translate(
+                task.done_date
+                  ? "resources.tasks.completed_on"
+                  : "resources.tasks.fields.due_short",
+              )}
               &nbsp;
-              <DateField source="due_date" record={task} showDate showTime />
+              <DateField
+                source={task.done_date ? "done_date" : "due_date"}
+                record={task}
+                showDate
+                showTime
+              />
               {showContact && (
                 <ReferenceField<TData, Contact>
                   source="contact_id"
@@ -163,64 +176,62 @@ export const Task = ({
           </div>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-5 pr-0! size-8 cursor-pointer"
-              aria-label={translate("resources.tasks.actions.title")}
-            >
-              <MoreVertical className="size-5 md:size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
-              onClick={() => {
-                update("tasks", {
-                  id: task.id,
-                  data: {
-                    due_date: new Date(Date.now() + 24 * 60 * 60 * 1000)
-                      .toISOString()
-                      .slice(0, 10),
-                  },
-                  previousData: task,
-                });
-              }}
-            >
-              {translate("resources.tasks.actions.postpone_tomorrow")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
-              onClick={() => {
-                update("tasks", {
-                  id: task.id,
-                  data: {
-                    due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                      .toISOString()
-                      .slice(0, 10),
-                  },
-                  previousData: task,
-                });
-              }}
-            >
-              {translate("resources.tasks.actions.postpone_next_week")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
-              onClick={handleEdit}
-            >
-              {translate("ra.action.edit")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
-              onClick={handleDelete}
-            >
-              {translate("ra.action.delete")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 pr-0! size-8 cursor-pointer"
+                aria-label={translate("resources.tasks.actions.title")}
+              >
+                <MoreVertical className="size-5 md:size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
+                onClick={() => {
+                  update("tasks", {
+                    id: task.id,
+                    data: {
+                      due_date: addDays(new Date(), 1).toISOString(),
+                    },
+                    previousData: task,
+                  });
+                }}
+              >
+                {translate("resources.tasks.actions.postpone_tomorrow")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
+                onClick={() => {
+                  update("tasks", {
+                    id: task.id,
+                    data: {
+                      due_date: addDays(new Date(), 7).toISOString(),
+                    },
+                    previousData: task,
+                  });
+                }}
+              >
+                {translate("resources.tasks.actions.postpone_next_week")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
+                onClick={handleEdit}
+              >
+                {translate("ra.action.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer h-12 md:h-8 px-4 md:px-2 text-base md:text-sm"
+                onClick={handleDelete}
+              >
+                {translate("ra.action.delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {isMobile ? (

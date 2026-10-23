@@ -1,3 +1,4 @@
+import { OperationsPage } from "../operations/OperationsPage";
 import type {
   CoreAdminProps,
   AuthProvider,
@@ -262,6 +263,7 @@ const DesktopAdmin = (
       </CustomRoutes>
 
       <CustomRoutes>
+        <Route path="/operations" element={<OperationsPage />} />
         <Route path={ProfilePage.path} element={<ProfilePage />} />
         <Route path={SettingsPage.path} element={<SettingsPage />} />
         <Route path={ImportPage.path} element={<ImportPage />} />
@@ -345,6 +347,7 @@ const MobileAdmin = (
           <Route path={OAuthConsentPage.path} element={<OAuthConsentPage />} />
         </CustomRoutes>
         <CustomRoutes>
+          <Route path="/operations" element={<OperationsPage />} />
           <Route
             path={SettingsPageMobile.path}
             element={<SettingsPageMobile />}

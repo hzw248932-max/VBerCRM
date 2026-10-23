@@ -284,7 +284,13 @@ export const chineseCrmMessages = {
       sheet: { edit: "编辑任务", edit_for: "编辑 %{name} 的任务" },
       empty: "暂无任务",
       empty_list_hint: "为联系人添加的任务会显示在这里。",
+      completed_on: "完成于",
+      load_error: "任务加载失败，请重试。",
+      loaded_count: "已显示 %{loaded} / %{total} 条",
+      no_completed: "暂无已完成的跟进任务",
       filters: {
+        pending: "待跟进",
+        completed: "已完成",
         later: "以后",
         overdue: "已逾期",
         this_week: "本周",

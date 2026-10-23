@@ -88,9 +88,9 @@ export function useContactImport() {
             linkedin_url,
           }) => {
             const email_jsonb = [
-              { email: email_work, type: "Work" },
-              { email: email_home, type: "Home" },
-              { email: email_other, type: "Other" },
+              { email: email_work?.trim(), type: "Work" },
+              { email: email_home?.trim(), type: "Home" },
+              { email: email_other?.trim(), type: "Other" },
             ].filter(({ email }) => email);
             const phone_jsonb = [
               { number: phone_work, type: "Work" },

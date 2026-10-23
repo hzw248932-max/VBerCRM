@@ -11,6 +11,7 @@ import {
   useRefresh,
   useTranslate,
   useUpdate,
+  useCanAccess,
 } from "ra-core";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { EditButton } from "@/components/admin/edit-button";
@@ -201,6 +202,11 @@ const ArchivedTitle = () => {
 };
 
 const ArchiveButton = ({ record }: { record: Deal }) => {
+  const { canAccess } = useCanAccess({
+    resource: "deals",
+    action: "edit",
+    record,
+  });
   const translate = useTranslate();
   const [update] = useUpdate();
   const redirect = useRedirect();
@@ -235,6 +241,7 @@ const ArchiveButton = ({ record }: { record: Deal }) => {
   return (
     <Button
       onClick={handleClick}
+      disabled={!canAccess}
       size="sm"
       variant="outline"
       className="flex items-center gap-2 h-9"
@@ -246,6 +253,11 @@ const ArchiveButton = ({ record }: { record: Deal }) => {
 };
 
 const UnarchiveButton = ({ record }: { record: Deal }) => {
+  const { canAccess } = useCanAccess({
+    resource: "deals",
+    action: "edit",
+    record,
+  });
   const translate = useTranslate();
   const dataProvider = useDataProvider();
   const redirect = useRedirect();
@@ -276,6 +288,7 @@ const UnarchiveButton = ({ record }: { record: Deal }) => {
   return (
     <Button
       onClick={handleClick}
+      disabled={!canAccess}
       size="sm"
       variant="outline"
       className="flex items-center gap-2 h-9"

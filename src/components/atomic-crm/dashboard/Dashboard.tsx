@@ -1,3 +1,4 @@
+import { OperationsLink } from "../operations/OperationsLink";
 import { useGetList } from "ra-core";
 
 import type { Contact, ContactNote } from "../types";
@@ -8,7 +9,14 @@ import { HotContacts } from "./HotContacts";
 import { TasksList } from "./TasksList";
 import { Welcome } from "./Welcome";
 
-export const Dashboard = () => {
+export const Dashboard = () => (
+  <>
+    <OperationsLink />
+    <DashboardContent />
+  </>
+);
+
+const DashboardContent = () => {
   const {
     data: dataContact,
     total: totalContact,

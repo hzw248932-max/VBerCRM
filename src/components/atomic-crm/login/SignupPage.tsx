@@ -23,7 +23,11 @@ export const SignupPage = () => {
   const { darkModeLogo: logo, title } = useConfigurationContext();
   const navigate = useNavigate();
   const translate = useTranslate();
-  const { data: isInitialized, isPending } = useQuery({
+  const {
+    data: isInitialized,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ["init"],
     queryFn: async () => {
       return dataProvider.isInitialized();
@@ -88,6 +92,8 @@ export const SignupPage = () => {
   }
 
   // For the moment, we only allow one user to sign up. Other users must be created by the administrator.
+  if (error) return <Navigate to="/login" replace />;
+
   if (isInitialized) {
     return <Navigate to="/login" />;
   }
