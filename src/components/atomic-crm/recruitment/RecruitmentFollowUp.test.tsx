@@ -60,7 +60,9 @@ describe("recruitment follow-up screen", () => {
     expect(String(data[0].contact_id)).toBe("1");
     expect(data[0].recruitment_id).toBe(1);
     expect(data[0].sales_id).toBe(0);
-    await screen.getByRole("checkbox").click();
+    await screen
+      .getByRole("checkbox", { name: followUpText(record), exact: true })
+      .click();
     await expect.element(create).toBeEnabled();
     const { data: lead } = await provider!.getOne("recruitment", { id: 1 });
     expect(lead.status).toBe("confirmed");

@@ -98,6 +98,8 @@ export const Task = ({
         >
           <Checkbox
             id={labelId}
+            aria-label={task.text}
+            onClick={(event) => event.stopPropagation()}
             checked={!!task.done_date}
             onCheckedChange={handleCheck()}
             disabled={isUpdatePending}

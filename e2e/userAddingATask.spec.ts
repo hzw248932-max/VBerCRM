@@ -39,7 +39,7 @@ test.describe("user adding a task", () => {
       company_id: company.id,
     });
   });
-  test("user adding a task", async ({ page, isMobile, menu, dismissToast }) => {
+  test("user adding a task", async ({ page, isMobile, menu }) => {
     page.on("pageerror", (error) =>
       console.error("Browser error:", error.message),
     );
@@ -78,9 +78,17 @@ test.describe("user adding a task", () => {
     await page.getByLabel("Type").click();
     await page.getByRole("option", { name: "Call" }).click();
 
-    await page.getByRole("button", { name: "Save" }).click();
-
-    await dismissToast("Task added");
+    const [created] = await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().includes("/rest/v1/tasks") &&
+          response.request().method() === "POST",
+      ),
+      page.getByRole("button", { name: "Save", exact: true }).click(),
+    ]);
+    expect(created.ok()).toBeTruthy();
+    await expect(page.getByLabel("Description *")).not.toBeVisible();
+    await page.reload();
 
     if (isMobile) {
       await expect(page.getByText("1 task")).toBeVisible();
