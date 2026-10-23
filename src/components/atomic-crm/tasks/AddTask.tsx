@@ -10,7 +10,7 @@ import {
   useTranslate,
   useUpdate,
 } from "ra-core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SaveButton } from "@/components/admin/form";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +43,16 @@ export const AddTask = ({
   const translate = useTranslate();
   const contact = useRecordContext();
   const [open, setOpen] = useState(false);
+  // A changing default date resets the form when identity/contact queries update.
+  const record = useMemo(
+    () => ({
+      type: "none",
+      contact_id: contact?.id,
+      due_date: new Date().toISOString(),
+      sales_id: identity?.id,
+    }),
+    [contact?.id, identity?.id],
+  );
   const handleOpen = () => {
     setOpen(true);
   };
@@ -102,12 +112,7 @@ export const AddTask = ({
 
       <CreateBase
         resource="tasks"
-        record={{
-          type: "none",
-          contact_id: contact?.id,
-          due_date: new Date().toISOString(),
-          sales_id: identity.id,
-        }}
+        record={record}
         mutationOptions={{ onSuccess: handleSuccess }}
       >
         <Dialog open={open} onOpenChange={() => setOpen(false)}>

@@ -12,6 +12,7 @@ import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "../notes/foreignKeyMapping";
 import { TaskFormContent } from "./TaskFormContent";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 export interface TaskCreateSheetProps {
   open: boolean;
@@ -38,6 +39,15 @@ export const TaskCreateSheet = ({
   const dataProvider = useDataProvider();
   const queryClient = useQueryClient();
   const notify = useNotify();
+  const record = useMemo(
+    () => ({
+      type: "none",
+      contact_id,
+      due_date: new Date().toISOString(),
+      sales_id: identity?.id,
+    }),
+    [contact_id, identity?.id],
+  );
 
   if (!identity) return null;
 
@@ -75,12 +85,7 @@ export const TaskCreateSheet = ({
         </span>
       }
       redirect={false}
-      record={{
-        type: "none",
-        contact_id,
-        due_date: new Date().toISOString(),
-        sales_id: identity.id,
-      }}
+      record={record}
       mutationOptions={{
         onSuccess: handleSuccess,
       }}
