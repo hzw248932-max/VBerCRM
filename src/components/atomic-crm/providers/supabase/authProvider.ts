@@ -6,6 +6,7 @@ import { supabaseAuthProvider } from "ra-supabase-core";
 import { completeEmailCallback } from "./authCallback";
 
 import { canAccess } from "../commons/canAccess";
+import { resolveAccessRecord } from "../commons/resolveAccessRecord";
 import { getSupabaseClient } from "./supabase";
 
 const getBaseAuthProvider = () =>
@@ -170,21 +171,20 @@ export const getAuthProvider = (): AuthProvider => {
       // Compute access rights from the sale role
       const role = sale.administrator ? "admin" : "user";
       let record = params.record;
-      const parent = (
-        {
-          recruitment: ["companies", "company_id"],
-          contact_notes: ["contacts", "contact_id"],
-          deal_notes: ["deals", "deal_id"],
-        } as Record<string, string[]>
-      )[params.resource];
-      if (role !== "admin" && parent && record) {
-        const { data, error } = await getSupabaseClient()
-          .from(parent[0])
-          .select("sales_id")
-          .eq("id", record[parent[1]])
-          .single();
-        if (error || !data) return false;
-        record = { ...record, sales_id: data.sales_id };
+      if (role !== "admin") {
+        const resolved = await resolveAccessRecord(
+          params,
+          async (resource, id) => {
+            const { data, error } = await getSupabaseClient()
+              .from(resource)
+              .select("sales_id")
+              .eq("id", id)
+              .single();
+            return error ? null : data;
+          },
+        );
+        if (resolved === null) return false;
+        record = resolved;
       }
       return canAccess(role, { ...params, record }, sale.id);
     },

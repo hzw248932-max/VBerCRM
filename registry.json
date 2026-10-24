@@ -258,6 +258,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/providers/supabase/checkPermissionError.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/providers/supabase/authProvider.ts",
           "type": "registry:component"
         },
@@ -351,6 +355,10 @@
         },
         {
           "path": "src/components/atomic-crm/providers/fakerest/dataGenerator/companies.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/providers/commons/resolveAccessRecord.ts",
           "type": "registry:component"
         },
         {
