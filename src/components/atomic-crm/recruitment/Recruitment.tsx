@@ -10,9 +10,11 @@ import {
   useDataProvider,
   useListContext,
   useCanAccess,
+  useAuthProvider,
   type Identifier,
 } from "ra-core";
 import { Link } from "react-router";
+import { useWatch } from "react-hook-form";
 import { RecruitmentFollowUp } from "./RecruitmentFollowUp";
 import { ArrayInput } from "@/components/admin/array-input";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
@@ -308,22 +310,61 @@ const Inputs = ({ editing = false }: { editing?: boolean }) => (
       <Button variant="outline" asChild>
         <Link to="/recruitment">返回列表</Link>
       </Button>
-      <SaveButton label="保存招聘信号" />
+      {editing ? (
+        <SaveButton label="保存招聘信号" />
+      ) : (
+        <RecruitmentCreateSave />
+      )}
     </div>
   </>
 );
-const errorMessage = (error: { message?: string }) =>
-  error.message?.includes("recruitment_company_id_key")
-    ? "该公司已有招聘筛选记录，请返回列表编辑，避免重复建档。"
-    : "保存失败，请检查填写内容和网络连接后重试。";
+const RecruitmentCreateSave = () => {
+  const companyId = useWatch({ name: "company_id" });
+  const { canAccess, isPending } = useCanAccess({
+    resource: "recruitment",
+    action: "edit",
+    record: { company_id: companyId },
+  });
+  return (
+    <div>
+      {companyId && !isPending && !canAccess && (
+        <p role="alert">
+          仅公司负责人和管理员可添加招聘信号，请选择自己负责的公司。
+        </p>
+      )}
+      <SaveButton
+        label="保存招聘信号"
+        disabled={!companyId || isPending || !canAccess}
+      />
+    </div>
+  );
+};
+const errorMessage = (error: { message?: string; status?: number }) =>
+  error.status === 403
+    ? "权限不足：仅公司负责人和管理员可保存招聘信号。"
+    : error.message?.includes("recruitment_company_id_key")
+      ? "该公司已有招聘筛选记录，请返回列表编辑，避免重复建档。"
+      : "保存失败，请检查填写内容和网络连接后重试。";
 
 export const RecruitmentCreate = () => {
   const notify = useNotify();
   const provider = useDataProvider();
+  const authProvider = useAuthProvider();
   const validate = async (values: Partial<Recruitment>) => {
     const errors = validateRecruitment(values);
     if (values.company_id) {
       try {
+        if (
+          authProvider?.canAccess &&
+          !(await authProvider.canAccess({
+            resource: "recruitment",
+            action: "edit",
+            record: { company_id: values.company_id },
+          }))
+        ) {
+          errors.company_id = "仅公司负责人和管理员可添加招聘信号。";
+          return errors;
+        }
         const { data } = await provider.getList("recruitment", {
           filter: { company_id: values.company_id },
           pagination: { page: 1, perPage: 1 },

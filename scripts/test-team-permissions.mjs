@@ -40,7 +40,7 @@ create table public.recruitment (id bigint primary key, company_id bigint refere
   );
   await db.exec(
     readFileSync(
-      "supabase/migrations/20261023064603_team_collaboration_permissions.sql",
+      "supabase/migrations/20261024075403_team_collaboration_permissions.sql",
       "utf8",
     ),
   );

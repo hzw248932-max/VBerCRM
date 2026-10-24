@@ -1,4 +1,5 @@
 import { resolveInitialization } from "./initialization";
+import { checkPermissionError } from "./checkPermissionError";
 import type { AuthProvider } from "ra-core";
 import { supabaseAuthProvider } from "ra-supabase-core";
 
@@ -91,6 +92,12 @@ export const getAuthProvider = (): AuthProvider => {
   const baseAuthProvider = getBaseAuthProvider();
   return {
     ...baseAuthProvider,
+    checkError: (error) =>
+      checkPermissionError(
+        error,
+        async () => Boolean(await getSale()),
+        () => baseAuthProvider.checkError(error),
+      ),
     handleCallback: async () => {
       clearCache();
       return completeEmailCallback(getSupabaseClient(), window.location.hash);
